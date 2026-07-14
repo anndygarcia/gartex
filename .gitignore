@@ -1,0 +1,18 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local dev
+*.log
+.env
+.env.local
+
+# Node (not used right now but safe)
+node_modules/
+npm-debug.log*
