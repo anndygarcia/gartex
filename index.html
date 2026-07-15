@@ -19,15 +19,15 @@
         <span class="logo-mark">G</span>
         <span class="logo-text">GARTEX<span class="logo-thin">CONSTRUCTION</span></span>
       </a>
-      <nav class="nav-links">
+      <nav class="nav-links" id="navLinks">
         <a href="#services">Services</a>
         <a href="#projects">Projects</a>
         <a href="#about">About</a>
         <a href="#service-areas">Areas</a>
         <a href="#contact">Contact</a>
+        <a href="mailto:Gartexbuilders@gmail.com?subject=Quote%20Request%20-%20Gartex%20Construction" class="btn btn-primary mobile-cta">Get a Quote</a>
       </nav>
-      <a href="mailto:Gartexbuilders@gmail.com?subject=Quote%20Request%20-%20Gartex%20Construction" class="btn btn-primary nav-cta">Get a Quote</a>
-      <button class="mobile-toggle" aria-label="Open menu">
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -335,12 +335,46 @@
       });
     });
 
-    // Mobile toggle (basic)
-    const toggle = document.querySelector('.mobile-toggle');
-    const nav = document.querySelector('.nav-links');
-    toggle?.addEventListener('click', () => {
-      nav.classList.toggle('open');
-    });
+    // Mobile menu controller
+    (() => {
+      const toggle = document.getElementById('mobileToggle');
+      const nav = document.getElementById('navLinks');
+      if (!toggle || !nav) return;
+
+      const isOpen = () => nav.classList.contains('open');
+
+      const setOpen = (open) => {
+        nav.classList.toggle('open', open);
+        toggle.classList.toggle('is-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        document.body.style.overflow = open ? 'hidden' : '';
+      };
+
+      toggle.addEventListener('click', () => setOpen(!isOpen()));
+
+      // Close on link click (so anchor scroll feels right)
+      nav.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => { if (isOpen()) setOpen(false); });
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && isOpen()) { setOpen(false); toggle.focus(); }
+      });
+
+      // Close when tapping outside the open menu
+      document.addEventListener('click', e => {
+        if (!isOpen()) return;
+        if (nav.contains(e.target) || toggle.contains(e.target)) return;
+        setOpen(false);
+      });
+
+      // If we resize back up to desktop, make sure body scroll is unlocked
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 900 && isOpen()) setOpen(false);
+      });
+    })();
 
     // Contact form → mailto Gartexbuilders@gmail.com
     const form = document.getElementById('contactForm');
