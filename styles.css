@@ -240,23 +240,23 @@ a { color: inherit; text-decoration: none; }
   max-width: var(--container);
 }
 
-/* Inner column — keeps all hero text aligned as one cohesive block
-   instead of stretching across the full 1200px container. */
+/* Inner column — left-aligned within the container, never wider than 720px
+   so the title doesn't fill the column edge-to-edge on big screens. */
 .hero-inner {
-  max-width: 560px;          /* tight column — natural headline + 2-line subtitle */
-  margin: 0 auto;
+  max-width: 720px;
+  width: 100%;
+  /* left-aligned; no auto-centering (text reads more like a column / editorial) */
+  margin-left: 0;
+  margin-right: auto;
 }
 
-@media (max-width: 1100px) {
-  .hero-inner { max-width: 520px; }
-}
 @media (max-width: 768px) {
-  /* On tablets/phones the column can be wider — container padding handles sides */
+  /* On phones, fill the container — sidebar padding handles sides */
   .hero-inner { max-width: 100%; }
 }
 
 .hero-title {
-  font-size: clamp(28px, 3.5vw, 40px);  /* confident headline size, not a banner */
+  font-size: clamp(28px, 3.4vw, 38px);  /* confident headline, leaves breathing room */
   font-weight: 700;
   line-height: 1.18;
   letter-spacing: -0.015em;
