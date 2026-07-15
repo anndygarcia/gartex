@@ -83,16 +83,17 @@ a { color: inherit; text-decoration: none; }
   color: var(--color-text);
 }
 
-.logo-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius);
-  background: var(--color-primary);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 18px;
+.logo-mark-img {
+  width: 40px;
+  height: 40px;
+  display: block;
+  border-radius: 4px;
+  flex-shrink: 0;             /* never compress in tight nav */
+}
+
+.footer-brand .logo-mark-img {
+  width: 44px;
+  height: 44px;
 }
 
 .logo-text {
