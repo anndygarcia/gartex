@@ -16,3 +16,9 @@ Thumbs.db
 # Node (not used right now but safe)
 node_modules/
 npm-debug.log*
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
