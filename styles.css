@@ -242,12 +242,12 @@ a { color: inherit; text-decoration: none; }
 /* Inner column — keeps all hero text aligned as one cohesive block
    instead of stretching across the full 1200px container. */
 .hero-inner {
-  max-width: 620px;          /* desktop: ~3-line title, confident reading width */
+  max-width: 700px;          /* desktop: comfortable column */
   margin: 0 auto;            /* centered within the container, with container padding on sides */
 }
 
 @media (max-width: 1100px) {
-  .hero-inner { max-width: 560px; }
+  .hero-inner { max-width: 600px; }
 }
 @media (max-width: 768px) {
   /* On tablets/phones the column can be wider — container padding handles sides */
@@ -255,11 +255,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero-title {
-  font-size: clamp(32px, 4.6vw, 52px);  /* tighter cap so ~3-line wrap on desktop */
+  font-size: clamp(30px, 4vw, 46px);  /* editorial size — feels like a headline, not a banner */
   font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  margin-bottom: 24px;
+  line-height: 1.15;
+  letter-spacing: -0.018em;            /* tighter tracking = more natural at smaller sizes */
+  margin-bottom: 20px;
   color: #fff;
 }
 
@@ -279,11 +279,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero-sub {
-  font-size: 17px;
-  line-height: 1.55;
-  color: rgba(255,255,255,0.88);
-  max-width: 520px;        /* subtitle hugs a bit tighter than the title */
-  margin-bottom: 32px;
+  font-size: 16.5px;
+  line-height: 1.65;                     /* generous line-height reads more natural */
+  color: rgba(255,255,255,0.85);
+  max-width: 540px;
+  margin-bottom: 28px;
 }
 
 .hero-ctas {

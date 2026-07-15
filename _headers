@@ -1,0 +1,22 @@
+# Cloudflare Pages cache headers
+# CSS/JS: short cache so deployments show up immediately
+# Images: 1 day cache (they're content-hashed anyway, and immutable in practice)
+# HTML: must-revalidate, no cache (always check origin)
+
+/styles.css
+  Cache-Control: public, max-age=300, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=86400, immutable
+
+/*.mp4
+  Cache-Control: public, max-age=86400, immutable
+
+/*.webm
+  Cache-Control: public, max-age=86400, immutable
+
+/*.jpg
+  Cache-Control: public, max-age=86400, immutable
