@@ -67,6 +67,93 @@ a { color: inherit; text-decoration: none; }
   .container { padding: 0 20px; }
 }
 
+/* ===== Promo banner (top, full width) =====
+   Cool-blue gradient: a brighter sky on the left fading to a deeper
+   electric blue on the right. White semi-bold text. Sits above the
+   sticky header; once you scroll past it, the header takes over.
+   The whole row is a click target leading to the contact form. */
+.promo-banner {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(90deg, #1e90ff 0%, #1f6bd6 50%, #124ea5 100%);
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 600;             /* Inter's semi-bold (between 500 and 700) */
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-align: center;
+  z-index: 110;                /* above the sticky header (which is 100) */
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 1px 2px rgba(0,0,0,0.12);
+}
+.promo-banner-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 12px 48px 12px 16px;   /* room on the right for the close button */
+  color: inherit;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.18s ease;
+}
+.promo-banner-link:hover,
+.promo-banner-link:focus-visible {
+  background-color: rgba(255, 255, 255, 0.10);
+  outline: none;
+}
+.promo-banner-text {
+  font-weight: 600;
+}
+.promo-banner-cta {
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.promo-banner-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  opacity: 0.85;
+  transition: background-color 0.18s ease, opacity 0.18s ease;
+}
+.promo-banner-close:hover,
+.promo-banner-close:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  opacity: 1;
+  outline: none;
+}
+/* Dismissed state — JS toggles `.is-hidden` */
+.promo-banner.is-hidden { display: none; }
+
+/* Mobile: tighten padding, drop the secondary "Book Now →" pill,
+   keep the main message prominent. */
+@media (max-width: 600px) {
+  .promo-banner { font-size: 14px; }
+  .promo-banner-link { padding: 10px 44px 10px 14px; gap: 10px; }
+  .promo-banner-cta { font-size: 12px; padding: 3px 8px; }
+  .promo-banner-close { right: 6px; font-size: 20px; }
+}
+/* Tiny screens: drop the pill entirely so the message fits cleanly */
+@media (max-width: 380px) {
+  .promo-banner-cta { display: none; }
+}
+
 /* ===== Header ===== */
 .site-header {
   position: sticky;

@@ -8,9 +8,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=hero4">
+  <link rel="stylesheet" href="styles.css?v=banner1">
 </head>
 <body>
+
+  <!-- Promo banner — sits above the nav so it's the first thing
+       every visitor sees. Cool-blue gradient, white semi-bold text.
+       Dismissible via × but the close state is per-session so it
+       doesn't ruin repeat visits. -->
+  <div class="promo-banner" id="promoBanner" role="region" aria-label="Free estimate offer">
+    <a class="promo-banner-link" href="#contact" aria-label="Book a free estimate">
+      <span class="promo-banner-text">Book for a Free Estimate!</span>
+      <span class="promo-banner-cta" aria-hidden="true">Book Now →</span>
+    </a>
+    <button class="promo-banner-close" id="promoBannerClose" aria-label="Dismiss banner">×</button>
+  </div>
 
   <!-- Header / Nav -->
   <header class="site-header">
@@ -324,6 +336,28 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Promo banner dismiss — sessionStorage so it doesn't reappear
+    // within the same tab, but a new session will see it again
+    // (which is the right behavior for a seasonal "Free estimate"
+    // offer).
+    (() => {
+      const banner = document.getElementById('promoBanner');
+      const close = document.getElementById('promoBannerClose');
+      if (!banner || !close) return;
+      try {
+        if (sessionStorage.getItem('promo-banner-dismissed') === '1') {
+          banner.classList.add('is-hidden');
+          return;
+        }
+      } catch (_) {}
+      close.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        banner.classList.add('is-hidden');
+        try { sessionStorage.setItem('promo-banner-dismissed', '1'); } catch (_) {}
+      });
+    })();
 
     // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(a => {
