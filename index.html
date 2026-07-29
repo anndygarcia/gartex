@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=banner2">
+  <link rel="stylesheet" href="styles.css?v=lead1">
 </head>
 <body>
 
@@ -37,7 +37,7 @@
         <a href="#about">About</a>
         <a href="#service-areas">Areas</a>
         <a href="#contact">Contact</a>
-        <a href="mailto:Gartexbuilders@gmail.com?subject=Quote%20Request%20-%20Gartex%20Construction" class="btn btn-primary mobile-cta">Get a Quote</a>
+        <a href="#contact" class="btn btn-primary mobile-cta">Get a Quote</a>
       </nav>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
@@ -59,7 +59,7 @@
         <h1 class="hero-title">Crafting the skeleton of <span class="accent">your dream home.</span></h1>
         <p class="hero-sub">Gartex Construction Company delivers precision framing and custom cornice work for high-end custom home builds. From foundation to finish, we build it right the first time.</p>
         <div class="hero-ctas">
-          <a href="mailto:Gartexbuilders@gmail.com?subject=Project%20Inquiry%20-%20Gartex%20Construction" class="btn btn-primary btn-light">Start Your Project</a>
+          <a href="#contact" class="btn btn-primary btn-light">Start Your Project</a>
         </div>
         <div class="hero-stats">
           <div class="stat"><strong>30+</strong><span>Years experience</span></div>
@@ -241,7 +241,7 @@
         <h2>Planning a custom build in Houston?</h2>
         <p>Let's talk about your project. We respond within one business day.</p>
       </div>
-      <a href="mailto:Gartexbuilders@gmail.com?subject=Free%20Estimate%20Request%20-%20Gartex%20Construction" class="btn btn-white">Get a Free Estimate →</a>
+      <a href="#contact" class="btn btn-white">Get a Free Estimate →</a>
     </div>
   </section>
 
@@ -278,20 +278,27 @@
       </div>
 
       <div class="contact-right">
-        <form class="contact-form" id="contactForm">
+        <form class="contact-form" id="contactForm" novalidate>
+          <!-- Honeypot: hidden input real users won't fill; bots will.
+               If this comes back non-empty, drop the lead silently. -->
+          <div class="hp" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+
           <div class="form-row">
             <div class="form-field">
               <label for="name">Name</label>
-              <input type="text" id="name" name="name" required>
+              <input type="text" id="name" name="name" required autocomplete="name">
             </div>
             <div class="form-field">
               <label for="phone">Phone</label>
-              <input type="tel" id="phone" name="phone">
+              <input type="tel" id="phone" name="phone" autocomplete="tel">
             </div>
           </div>
           <div class="form-field">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" required autocomplete="email">
           </div>
           <div class="form-field">
             <label for="location">Project location</label>
@@ -301,8 +308,8 @@
             <label for="project">Tell us about your project</label>
             <textarea id="project" name="project" rows="5" placeholder="Custom home build, addition, framing only, cornice work..."></textarea>
           </div>
-          <button type="submit" class="btn btn-primary btn-full">Send Message</button>
-          <p class="form-note">Submitting opens your email app to send directly to Gartexbuilders@gmail.com.</p>
+          <button type="submit" class="btn btn-primary btn-full" id="contactSubmit">Send Message</button>
+          <p class="form-note" id="formStatus">We respond within one business day. No spam, ever.</p>
         </form>
 
         <div class="map-card">
@@ -411,22 +418,58 @@
       });
     })();
 
-    // Contact form → mailto Gartexbuilders@gmail.com
+    // Contact form — POST to /api/lead (CF Pages Function). Email is
+    // sent to Gartexbuilders@gmail.com via Resend; the user never has
+    // to leave the page or open their mail client.
     const form = document.getElementById('contactForm');
-    form?.addEventListener('submit', e => {
+    const formStatus = document.getElementById('formStatus');
+    const submitBtn = document.getElementById('contactSubmit');
+    form?.addEventListener('submit', async e => {
       e.preventDefault();
+      formStatus.classList.remove('is-success', 'is-error');
       const data = Object.fromEntries(new FormData(form).entries());
-      const subject = `New project inquiry from ${data.name || 'Website visitor'}`;
-      const body = [
-        `Name: ${data.name || ''}`,
-        `Phone: ${data.phone || ''}`,
-        `Email: ${data.email || ''}`,
-        `Project location: ${data.location || ''}`,
-        '',
-        'Project details:',
-        data.project || ''
-      ].join('\n');
-      window.location.href = `mailto:Gartexbuilders@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      // Field-level validation (server validates again)
+      if (!data.name || data.name.trim().length < 2) {
+        formStatus.textContent = 'Please enter your name.';
+        formStatus.classList.add('is-error');
+        return;
+      }
+      if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        formStatus.textContent = 'Please enter a valid email so we can reply.';
+        formStatus.classList.add('is-error');
+        return;
+      }
+      if (!data.project || data.project.trim().length < 4) {
+        formStatus.textContent = 'Tell us a bit about your project (at least a few words).';
+        formStatus.classList.add('is-error');
+        return;
+      }
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending…';
+      formStatus.textContent = '';
+      try {
+        const res = await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body.ok) {
+          formStatus.textContent = '✓ Thanks! We received your message and will reply within one business day.';
+          formStatus.classList.add('is-success');
+          form.reset();
+        } else {
+          formStatus.textContent = body.error || `Something went wrong (HTTP ${res.status}). Please call (713) 703-6355.`;
+          formStatus.classList.add('is-error');
+        }
+      } catch (err) {
+        formStatus.textContent = 'Network error. Please try again or call (713) 703-6355.';
+        formStatus.classList.add('is-error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
     });
 
     // Pause video when offscreen to save battery

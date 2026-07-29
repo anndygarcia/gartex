@@ -31,7 +31,7 @@
 html {
   scroll-behavior: smooth;
   /* offset smooth-scroll targets so the sticky header doesn't cover them */
-  scroll-padding-top: 80px;
+  scroll-padding-top: 110px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -902,8 +902,20 @@ a { color: inherit; text-decoration: none; }
 .form-note {
   font-size: 12.5px;
   color: var(--color-text-muted);
+  margin-top: 10px;
   text-align: center;
-  margin-top: 4px;
+}
+.form-note.is-success { color: var(--color-primary); font-weight: 600; }
+.form-note.is-error { color: #b91c1c; font-weight: 600; }
+
+/* Honeypot field — keep it in the DOM but invisible to humans and
+   screen readers so bots that auto-fill every input get caught. */
+.hp {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
 }
 
 .contact-form {
@@ -1133,7 +1145,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- Large phone (≤ 600px) ---------- */
 @media (max-width: 600px) {
-  html { scroll-padding-top: 72px; }
+  html { scroll-padding-top: 96px; }
 
   /* Container padding handled by .container base + responsive at 900/600/380 */
 
