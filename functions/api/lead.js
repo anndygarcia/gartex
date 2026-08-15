@@ -63,6 +63,7 @@ function isRateLimited(ip) {
   return false;
 }
 
+console.log("LEAD FN LOADED");
 export async function onRequestPost({ request, env }) {
   try {
     return await onRequestPostImpl({ request, env });
