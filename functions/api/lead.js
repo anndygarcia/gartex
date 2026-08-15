@@ -64,6 +64,14 @@ function isRateLimited(ip) {
 }
 
 export async function onRequestPost({ request, env }) {
+  try {
+    return await onRequestPostImpl({ request, env });
+  } catch (e) {
+    return json({ error: `Unhandled error: ${e?.message || String(e)}` }, 500);
+  }
+}
+
+async function onRequestPostImpl({ request, env }) {
   const ip = request.headers.get('cf-connecting-ip') ||
              request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
              'unknown';
