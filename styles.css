@@ -259,6 +259,12 @@ a { color: inherit; text-decoration: none; }
   color: #fff;
   border-color: var(--color-primary);
 }
+/* !important guarantees white wins over any higher-specificity rule
+   that may have crept in (e.g. .nav-links a { color: ... }). */
+.btn-primary,
+.btn-primary:visited {
+  color: #fff !important;
+}
 .btn-primary:hover {
   background: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
