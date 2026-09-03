@@ -415,15 +415,15 @@ a { color: inherit; text-decoration: none; }
   flex: 0 0 auto;
 }
 
-/* Hero CTA — bright blue with orange hover. The "light" name now
-   means "light against the dark hero video/overlay" rather than
-   "white background". White text on a #1f6bd6 background pops
-   against the navy hero, and on hover swaps to the warm wood/orange
-   accent (#c87f3a) for a clear interactive cue. */
+/* Hero CTA — deep navy (matches .btn-primary nav button) with orange
+   hover. The "light" name now means "light against the dark hero
+   video/overlay". White text on a navy background pops against the
+   hero video, and on hover swaps to the warm wood/orange accent
+   (#c87f3a) for a clear interactive cue. */
 .btn-light {
-  background: #1f6bd6;
+  background: var(--color-primary);
   color: #fff;
-  border-color: #1f6bd6;
+  border-color: var(--color-primary);
 }
 .btn-light:hover {
   background: var(--color-accent);
