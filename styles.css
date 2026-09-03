@@ -1111,6 +1111,13 @@ a { color: inherit; text-decoration: none; }
     padding: 14px 18px;
     text-align: center;
     border-bottom: none;
+    /* The nav-links color (text-mid) was winning over .btn-primary's
+       white because the selector was more specific. Force white so the
+       text reads cleanly against the navy button. */
+    color: #fff;
+  }
+  .nav-links a.mobile-cta:hover {
+    color: #fff;
   }
 
   /* bring the primary CTA INTO the open menu, since the desktop one is hidden */
