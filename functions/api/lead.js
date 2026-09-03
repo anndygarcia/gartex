@@ -78,8 +78,19 @@ export async function onRequestPost({ request, env }) {
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;background:#ffffff;border:1px solid #dce7f5;border-radius:10px;overflow:hidden;">
         <!-- Header banner -->
         <tr><td style="background:linear-gradient(90deg,#1e90ff 0%,#1f6bd6 50%,#124ea5 100%);padding:24px 32px;">
-          <div style="color:#ffffff;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;opacity:0.85;">Gartex Construction Company · Lead Notification</div>
-          <div style="color:#ffffff;font-size:22px;font-weight:700;margin-top:4px;">New project inquiry</div>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+              <td style="vertical-align:middle;width:56px;">
+                <img src="https://gartex-construction.com/assets/logo/g-mark-v2.png"
+                     width="48" height="48" alt="Gartex Construction"
+                     style="display:block;border:0;border-radius:8px;background:#ffffff;padding:4px;">
+              </td>
+              <td style="vertical-align:middle;padding-left:16px;">
+                <div style="color:#ffffff;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;opacity:0.85;">Gartex Construction Company · Lead Notification</div>
+                <div style="color:#ffffff;font-size:22px;font-weight:700;margin-top:2px;line-height:1.2;">New project inquiry</div>
+              </td>
+            </tr>
+          </table>
         </td></tr>
         <!-- Body -->
         <tr><td style="padding:32px;">
@@ -128,9 +139,20 @@ export async function onRequestPost({ request, env }) {
           </p>
         </td></tr>
         <!-- Footer -->
-        <tr><td style="background:#0e1623;padding:20px 32px;color:#94a3b8;font-size:12.5px;line-height:1.6;">
-          Gartex Construction Company · Houston, Texas<br>
-          <a href="https://gartex-construction.com" style="color:#cbd5e1;text-decoration:none;">gartex-construction.com</a>
+        <tr><td style="background:#0e1623;padding:20px 32px;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+              <td style="vertical-align:middle;width:36px;">
+                <img src="https://gartex-construction.com/assets/logo/g-mark-v2.png"
+                     width="28" height="28" alt=""
+                     style="display:block;border:0;border-radius:5px;background:#ffffff;padding:3px;">
+              </td>
+              <td style="vertical-align:middle;padding-left:12px;color:#94a3b8;font-size:12.5px;line-height:1.5;">
+                <strong style="color:#cbd5e1;">Gartex Construction Company</strong> · Houston, Texas<br>
+                <a href="https://gartex-construction.com" style="color:#94a3b8;text-decoration:none;">gartex-construction.com</a>
+              </td>
+            </tr>
+          </table>
         </td></tr>
       </table>
     </td></tr>
@@ -190,8 +212,19 @@ export async function onRequestPost({ request, env }) {
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;background:#ffffff;border:1px solid #dce7f5;border-radius:10px;overflow:hidden;">
         <!-- Header banner -->
         <tr><td style="background:linear-gradient(90deg,#1e90ff 0%,#1f6bd6 50%,#124ea5 100%);padding:24px 32px;">
-          <div style="color:#ffffff;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;opacity:0.85;">Gartex Construction Company</div>
-          <div style="color:#ffffff;font-size:22px;font-weight:700;margin-top:4px;">Thanks for reaching out</div>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+              <td style="vertical-align:middle;width:56px;">
+                <img src="https://gartex-construction.com/assets/logo/g-mark-v2.png"
+                     width="48" height="48" alt="Gartex Construction"
+                     style="display:block;border:0;border-radius:8px;background:#ffffff;padding:4px;">
+              </td>
+              <td style="vertical-align:middle;padding-left:16px;">
+                <div style="color:#ffffff;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;opacity:0.85;">Gartex Construction Company</div>
+                <div style="color:#ffffff;font-size:22px;font-weight:700;margin-top:2px;line-height:1.2;">Thanks for reaching out</div>
+              </td>
+            </tr>
+          </table>
         </td></tr>
         <!-- Body -->
         <tr><td style="padding:32px;">
@@ -223,9 +256,20 @@ export async function onRequestPost({ request, env }) {
           </p>
         </td></tr>
         <!-- Footer -->
-        <tr><td style="background:#0e1623;padding:20px 32px;color:#94a3b8;font-size:12.5px;line-height:1.6;">
-          Houston, Texas · <a href="https://gartex-construction.com" style="color:#cbd5e1;text-decoration:none;">gartex-construction.com</a><br>
-          Custom framing and cornice work for Houston's finest custom homes.
+        <tr><td style="background:#0e1623;padding:20px 32px;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+              <td style="vertical-align:middle;width:36px;">
+                <img src="https://gartex-construction.com/assets/logo/g-mark-v2.png"
+                     width="28" height="28" alt=""
+                     style="display:block;border:0;border-radius:5px;background:#ffffff;padding:3px;">
+              </td>
+              <td style="vertical-align:middle;padding-left:12px;color:#94a3b8;font-size:12.5px;line-height:1.5;">
+                Houston, Texas · <a href="https://gartex-construction.com" style="color:#cbd5e1;text-decoration:none;">gartex-construction.com</a><br>
+                Custom framing and cornice work for Houston's finest custom homes.
+              </td>
+            </tr>
+          </table>
         </td></tr>
       </table>
     </td></tr>
