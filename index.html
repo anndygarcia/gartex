@@ -17,7 +17,7 @@
        Dismissible via × but the close state is per-session so it
        doesn't ruin repeat visits. -->
   <div class="promo-banner" id="promoBanner" role="region" aria-label="Free estimate offer">
-    <a class="promo-banner-link" href="#contact" aria-label="Book a free estimate">
+    <a class="promo-banner-link" href="#contactForm" aria-label="Book a free estimate">
       <span class="promo-banner-text">Book for a Free Estimate!</span>
       <span class="promo-banner-cta" aria-hidden="true">Book Now →</span>
     </a>
@@ -37,7 +37,7 @@
         <a href="#about">About</a>
         <a href="#service-areas">Areas</a>
         <a href="#contact">Contact</a>
-        <a href="#contact" class="btn btn-primary mobile-cta">Get a Quote</a>
+        <a href="#contactForm" class="btn btn-primary mobile-cta">Get a Quote</a>
       </nav>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
@@ -59,7 +59,7 @@
         <h1 class="hero-title">Crafting the skeleton of <span class="accent">your dream home.</span></h1>
         <p class="hero-sub">Gartex Construction Company delivers precision framing and custom cornice work for high-end custom home builds. From foundation to finish, we build it right the first time.</p>
         <div class="hero-ctas">
-          <a href="#contact" class="btn btn-primary btn-light">Start Your Project</a>
+          <a href="#contactForm" class="btn btn-primary btn-light">Start Your Project</a>
         </div>
         <div class="hero-stats">
           <div class="stat"><strong>30+</strong><span>Years experience</span></div>
@@ -241,7 +241,7 @@
         <h2>Planning a custom build in Houston?</h2>
         <p>Let's talk about your project. We respond within one business day.</p>
       </div>
-      <a href="#contact" class="btn btn-white">Get a Free Estimate →</a>
+      <a href="#contactForm" class="btn btn-white">Get a Free Estimate →</a>
     </div>
   </section>
 
@@ -366,13 +366,24 @@
       });
     })();
 
-    // Smooth scroll
+    // Smooth scroll — when landing on the contact form, also focus
+    // the first input so the visitor can start typing immediately.
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
         const href = a.getAttribute('href');
         if (href.length > 1) {
           const t = document.querySelector(href);
-          if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+          if (t) {
+            e.preventDefault();
+            t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // If landing on the contact form, focus the first input.
+            if (href === '#contactForm') {
+              setTimeout(() => {
+                const firstInput = t.querySelector('input, textarea');
+                if (firstInput) firstInput.focus({ preventScroll: true });
+              }, 600);
+            }
+          }
         }
       });
     });
