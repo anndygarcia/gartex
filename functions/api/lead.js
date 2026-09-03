@@ -1,12 +1,12 @@
 export async function onRequestPost({ request, env }) {
   const apiKey = env.RESEND_API_KEY;
-  if (!apiKey) {
-    return json({ error: 'Server not configured (missing RESEND_API_KEY).' }, 503);
-  }
+  if (!apiKey) return json({ error: 'Server not configured (missing RESEND_API_KEY).' }, 503);
   const from = env.LEAD_FROM;
   const to = env.LEAD_TO || 'gartexbuilders@gmail.com';
   if (!from) {
-    return json({ error: 'Server not configured (missing LEAD_FROM). Set LEAD_FROM in CF Pages env vars.' }, 503);
+    return json({
+      error: 'Server not configured (missing LEAD_FROM). Set LEAD_FROM in CF Pages env vars.',
+    }, 503);
   }
   try {
     const body = await request.json();
@@ -14,8 +14,12 @@ export async function onRequestPost({ request, env }) {
     const email = String(body.email || '').trim();
     const project = String(body.project || '').trim();
     if (name.length < 2) return json({ error: 'Please enter your name.' }, 400);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Please enter a valid email.' }, 400);
-    if (project.length < 4) return json({ error: 'Tell us a bit about your project.' }, 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return json({ error: 'Please enter a valid email.' }, 400);
+    }
+    if (project.length < 4) {
+      return json({ error: 'Tell us a bit about your project.' }, 400);
+    }
 
     const text = [
       `Name: ${name}`,
@@ -40,14 +44,16 @@ export async function onRequestPost({ request, env }) {
         text,
       }),
     });
-    const detail = await res.text().catch(() => '');
-    return json({
-      ok: res.ok,
-      status: res.status,
-      from_used: from,
-      to,
-      detail: detail.slice(0, 500),
-    }, res.ok ? 200 : 502);
+
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '');
+      return json({
+        error: `Email service rejected the submission (${res.status}).`,
+        detail: detail.slice(0, 300),
+      }, 502);
+    }
+    const result = await res.json().catch(() => ({}));
+    return json({ ok: true, lead_id: result.id }, 200);
   } catch (e) {
     return json({ error: `Server error: ${e.message}` }, 500);
   }
