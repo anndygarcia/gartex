@@ -1,44 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Skinny framing nail, tilted 45° clockwise (head top-left, point
+  bottom-right) so it reads naturally as the cursor — the same
+  orientation as the default OS arrow.
+  The drawing is laid out vertically in its own coordinate space
+  (head at top, point at bottom, centered on x=16) and then the
+  whole SVG is rotated 45° via the outer <g transform="rotate(-45 ...)" />.
+  We rotate -45 (counter-clockwise) about the center of the viewBox so
+  the head ends up in the top-left and the tip in the bottom-right.
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
-    <!-- Vertical metallic gradient: bright at the centerline, dark at
-         the edges to give the round shank a sense of 3D volume. -->
+    <!-- Vertical metallic gradient on the shank: bright centerline,
+         dark edges so it reads as a round cylinder. -->
     <linearGradient id="shankGrad" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0"   stop-color="#4a4f55"/>
-      <stop offset="0.25" stop-color="#7a8088"/>
-      <stop offset="0.5"  stop-color="#c8ccd1"/>
-      <stop offset="0.75" stop-color="#7a8088"/>
+      <stop offset="0.3" stop-color="#8a9098"/>
+      <stop offset="0.5" stop-color="#d8dce0"/>
+      <stop offset="0.7" stop-color="#8a9098"/>
       <stop offset="1"   stop-color="#4a4f55"/>
     </linearGradient>
     <linearGradient id="headGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#dde0e4"/>
+      <stop offset="0"   stop-color="#e0e3e7"/>
       <stop offset="0.5" stop-color="#9aa0a8"/>
-      <stop offset="1" stop-color="#5a6068"/>
-    </linearGradient>
-    <linearGradient id="headSide" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#b8bcc2"/>
-      <stop offset="1" stop-color="#5a6068"/>
+      <stop offset="1"   stop-color="#5a6068"/>
     </linearGradient>
   </defs>
 
-  <!-- Nail head: thin disc on top, drawn as ellipse so it reads as 3D.
-       Centered horizontally (cx=16). -->
-  <!-- Head side (the rim of the disc, visible below the top face) -->
-  <ellipse cx="16" cy="7.5" rx="6" ry="1.5" fill="url(#headSide)" stroke="#3a4046" stroke-width="0.4"/>
-  <!-- Head top face -->
-  <ellipse cx="16" cy="6.5" rx="6" ry="1.5" fill="url(#headGrad)" stroke="#3a4046" stroke-width="0.4"/>
+  <!-- Rotate the whole nail -45° about the center so head goes
+       top-left and point goes bottom-right (matching the OS arrow
+       orientation). -->
+  <g transform="rotate(-45 16 16)">
+    <!-- Head: thin disc, top of the shank. Smaller proportions now
+         (4.5 wide vs shank 3.5) so the nail feels skinny. -->
+    <ellipse cx="16" cy="5.5" rx="4.5" ry="1.1" fill="url(#headGrad)" stroke="#3a4046" stroke-width="0.35"/>
+    <!-- Side rim of the disc showing thickness -->
+    <ellipse cx="16" cy="6.3" rx="4.5" ry="1.1" fill="#7a8088" stroke="#3a4046" stroke-width="0.35"/>
 
-  <!-- Shank: straight cylinder, vertically aligned, going from head
-       down to the point. Symmetrical around x=16. -->
-  <rect x="13" y="8" width="6" height="14" fill="url(#shankGrad)" stroke="#3a4046" stroke-width="0.4"/>
+    <!-- Shank: skinny cylinder (3.5 wide) going from below the head
+         down to where the diamond point starts. -->
+    <rect x="14.25" y="7" width="3.5" height="15" fill="url(#shankGrad)" stroke="#3a4046" stroke-width="0.35"/>
 
-  <!-- Diamond point: 4-sided pyramid from the shank bottom
-       to a sharp tip at the bottom-center. -->
-  <polygon points="13,22 19,22 16,30" fill="#5a6068" stroke="#3a4046" stroke-width="0.4" stroke-linejoin="round"/>
+    <!-- Diamond point: 4-sided pyramid to the tip. -->
+    <polygon points="14.25,22 17.75,22 16,29" fill="#5a6068" stroke="#3a4046" stroke-width="0.35" stroke-linejoin="round"/>
 
-  <!-- Subtle highlight stripe down the centerline of the shank -->
-  <line x1="16" y1="8.5" x2="16" y2="21.5" stroke="#eef0f3" stroke-width="0.6" opacity="0.55"/>
+    <!-- Subtle highlight stripe down the centerline -->
+    <line x1="16" y1="7.5" x2="16" y2="21.5" stroke="#f0f2f5" stroke-width="0.5" opacity="0.6"/>
 
-  <!-- Subtle head highlight -->
-  <ellipse cx="14" cy="6.2" rx="2" ry="0.4" fill="#eef0f3" opacity="0.7"/>
+    <!-- Subtle head highlight -->
+    <ellipse cx="14.5" cy="5.3" rx="1.5" ry="0.35" fill="#f0f2f5" opacity="0.7"/>
+  </g>
 </svg>
