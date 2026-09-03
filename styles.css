@@ -67,6 +67,18 @@ a { color: inherit; text-decoration: none; }
   .container { padding: 0 20px; }
 }
 
+/* ===== Cursor ===== *
+   Replace the default arrow with a framing nail graphic.
+   The hotspot (the point the OS uses as the "click point") is at
+   the diamond tip (bottom-right of the SVG, ~28px from origin).
+   Cursor stays on hover for links/buttons via their existing
+   cursor: pointer declarations. */
+html, body {
+  cursor: url("assets/cursor/nail.svg") 28 28, auto;
+}
+
+/* Cursor: pointer overrides stay in place for clickable elements */
+
 /* ===== Promo banner (top, full width) =====
    Cool-blue gradient: a brighter sky on the left fading to a deeper
    electric blue on the right. White semi-bold text. Sits above the

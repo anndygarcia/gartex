@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="shankGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c87f3a"/>
+      <stop offset="1" stop-color="#8a5824"/>
+    </linearGradient>
+  </defs>
+  <!-- Nail head (flat round, top-left) -->
+  <ellipse cx="9" cy="9" rx="7" ry="2" fill="#a96528" stroke="#5e3b17" stroke-width="0.8"/>
+  <!-- Shank (body, diagonal) -->
+  <path d="M 11 11 L 26 26 L 27.5 24.5 L 12.5 9.5 Z"
+        fill="url(#shankGrad)" stroke="#5e3b17" stroke-width="0.8" stroke-linejoin="round"/>
+  <!-- Highlight stripe on shank -->
+  <path d="M 12 11.5 L 25 24.5 L 25.5 24 L 12.5 11 Z" fill="#dba266" opacity="0.6"/>
+  <!-- Diamond point tip -->
+  <polygon points="26,26 27.5,24.5 28.5,28.5" fill="#5e3b17"/>
+</svg>

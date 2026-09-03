@@ -7,6 +7,8 @@
   Cache-Control: public, max-age=86400, must-revalidate
   /assets/favicons/*
   Cache-Control: public, max-age=86400, must-revalidate
+  /assets/cursor/*
+  Cache-Control: public, max-age=86400, must-revalidate
 
 # Cloudflare Pages cache headers
 # CSS: short cache so deployments show up immediately
