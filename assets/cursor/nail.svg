@@ -27,10 +27,10 @@
     </linearGradient>
   </defs>
 
-  <!-- Rotate the whole nail -45° about the center so head goes
-       top-left and point goes bottom-right (matching the OS arrow
-       orientation). -->
-  <g transform="rotate(-45 16 16)">
+  <!-- Rotate the whole nail 135° clockwise about the center so the
+       tip lands in the top-left (same position as the OS cursor's
+       hot point) and the head ends up in the bottom-right. -->
+  <g transform="rotate(135 16 16)">
     <!-- Head: thin disc, top of the shank. Smaller proportions now
          (4.5 wide vs shank 3.5) so the nail feels skinny. -->
     <ellipse cx="16" cy="5.5" rx="4.5" ry="1.1" fill="url(#headGrad)" stroke="#3a4046" stroke-width="0.35"/>

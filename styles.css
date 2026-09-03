@@ -68,14 +68,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ===== Cursor ===== *
-   Replace the default arrow with a framing nail graphic — tilted
-   45° clockwise (head top-left, point bottom-right) so it matches
-   the default OS cursor's reading direction. The query string on
-   the SVG is a cache-buster — bumping it forces every browser to
-   refetch the new SVG when the asset changes. The hotspot is at
-   the rotated tip (~25,25). */
+   Replace the default arrow with a framing nail graphic — rotated
+   so the tip lands in the top-left at the same hot-point as the
+   default OS cursor. The query string on the SVG is a cache-buster.
+*/
 html, body {
-  cursor: url("assets/cursor/nail.svg?v=4") 25 25, auto;
+  cursor: url("assets/cursor/nail.svg?v=5") 7 7, auto;
 }
 
 /* Cursor: pointer overrides stay in place for clickable elements */
