@@ -919,14 +919,21 @@ a { color: inherit; text-decoration: none; }
 }
 
 .contact-form {
-  background: #fff;
-  border: 1px solid var(--color-border);
+  /* Subtle vertical gradient (white → very pale cool blue) — pulls
+     double duty: visually lifts the card off the page background and
+     ties it to the same cool palette used by the promo banner. */
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+  border: 1px solid #dce7f5;
   border-radius: var(--radius-lg);
   padding: 36px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  box-shadow: var(--shadow-card);
+  /* Blue-tinted shadow instead of neutral gray — keeps the navy
+     palette consistent across cards. */
+  box-shadow:
+    0 1px 2px rgba(31, 58, 95, 0.04),
+    0 6px 18px rgba(31, 58, 95, 0.07);
 }
 
 .form-row {
@@ -944,7 +951,9 @@ a { color: inherit; text-decoration: none; }
 .form-field label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-text);
+  /* Navy labels — gives the form a clear hierarchy and matches the
+     rest of the brand typography. */
+  color: var(--color-primary);
   letter-spacing: 0.02em;
 }
 
@@ -953,26 +962,55 @@ a { color: inherit; text-decoration: none; }
   font-family: inherit;
   font-size: 16px;          /* 16px+ prevents iOS Safari from auto-zooming on focus */
   padding: 12px 14px;
-  border: 1px solid var(--color-border-strong);
+  /* Cool blue-gray border — softer than the neutral gray, but still
+     feels like a field outline. */
+  border: 1px solid #dce7f5;
   border-radius: var(--radius);
-  background: #fff;
+  background: #fafcff;       /* very faint blue tint inside the field */
   color: var(--color-text);
-  transition: border-color 0.15s, box-shadow 0.15s;
-  width: 100%;              /* fill grid column */
-  -webkit-appearance: none; /* strip iOS default form styling */
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  width: 100%;
+  -webkit-appearance: none;
   appearance: none;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #7a8aa3;            /* muted slate-blue — feels in-palette even
+                                before the user starts typing */
+  opacity: 1;                /* override Firefox's lower default opacity */
+}
+
+.form-field input:hover:not(:focus),
+.form-field textarea:hover:not(:focus) {
+  border-color: #c2d2ea;     /* lift the border slightly on hover */
 }
 
 .form-field input:focus,
 .form-field textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(31,58,95,0.12);
+  /* Brighter banner-blue border on focus, with a soft glow that
+     matches the promo banner's mid-stop. */
+  border-color: #1f6bd6;
+  background: #ffffff;       /* solidify the field on focus */
+  box-shadow: 0 0 0 4px rgba(31, 107, 214, 0.18);
 }
 
 .form-field textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+/* Submit button — same navy as the rest of the site, but the hover
+   state picks up the brighter banner blue for visual continuity with
+   the CTA. The .btn-primary base style is reused (inherited from
+   styles.css above the contact block). */
+.contact-form .btn-primary {
+  margin-top: 6px;
+}
+.contact-form .btn-primary:hover {
+  background: linear-gradient(180deg, #1f6bd6 0%, #1a4f9e 100%);
+  border-color: transparent;
 }
 
 /* ===== Footer ===== */
