@@ -2,6 +2,12 @@
 /*.svg
   Cache-Control: public, max-age=3600, must-revalidate
 
+# Favicons: 1 day cache (almost never change)
+  /favicon.ico
+  Cache-Control: public, max-age=86400, must-revalidate
+  /assets/favicons/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
 # Cloudflare Pages cache headers
 # CSS: short cache so deployments show up immediately
 # HTML: must-revalidate, no cache (always check origin)
