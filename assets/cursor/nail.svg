@@ -1,18 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
-    <linearGradient id="shankGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c87f3a"/>
-      <stop offset="1" stop-color="#8a5824"/>
+    <!-- Vertical metallic gradient: bright at the centerline, dark at
+         the edges to give the round shank a sense of 3D volume. -->
+    <linearGradient id="shankGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#4a4f55"/>
+      <stop offset="0.25" stop-color="#7a8088"/>
+      <stop offset="0.5"  stop-color="#c8ccd1"/>
+      <stop offset="0.75" stop-color="#7a8088"/>
+      <stop offset="1"   stop-color="#4a4f55"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dde0e4"/>
+      <stop offset="0.5" stop-color="#9aa0a8"/>
+      <stop offset="1" stop-color="#5a6068"/>
+    </linearGradient>
+    <linearGradient id="headSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8bcc2"/>
+      <stop offset="1" stop-color="#5a6068"/>
     </linearGradient>
   </defs>
-  <!-- Nail head (flat round, top-left) -->
-  <ellipse cx="9" cy="9" rx="7" ry="2" fill="#a96528" stroke="#5e3b17" stroke-width="0.8"/>
-  <!-- Shank (body, diagonal) -->
-  <path d="M 11 11 L 26 26 L 27.5 24.5 L 12.5 9.5 Z"
-        fill="url(#shankGrad)" stroke="#5e3b17" stroke-width="0.8" stroke-linejoin="round"/>
-  <!-- Highlight stripe on shank -->
-  <path d="M 12 11.5 L 25 24.5 L 25.5 24 L 12.5 11 Z" fill="#dba266" opacity="0.6"/>
-  <!-- Diamond point tip -->
-  <polygon points="26,26 27.5,24.5 28.5,28.5" fill="#5e3b17"/>
+
+  <!-- Nail head: thin disc on top, drawn as ellipse so it reads as 3D.
+       Centered horizontally (cx=16). -->
+  <!-- Head side (the rim of the disc, visible below the top face) -->
+  <ellipse cx="16" cy="7.5" rx="6" ry="1.5" fill="url(#headSide)" stroke="#3a4046" stroke-width="0.4"/>
+  <!-- Head top face -->
+  <ellipse cx="16" cy="6.5" rx="6" ry="1.5" fill="url(#headGrad)" stroke="#3a4046" stroke-width="0.4"/>
+
+  <!-- Shank: straight cylinder, vertically aligned, going from head
+       down to the point. Symmetrical around x=16. -->
+  <rect x="13" y="8" width="6" height="14" fill="url(#shankGrad)" stroke="#3a4046" stroke-width="0.4"/>
+
+  <!-- Diamond point: 4-sided pyramid from the shank bottom
+       to a sharp tip at the bottom-center. -->
+  <polygon points="13,22 19,22 16,30" fill="#5a6068" stroke="#3a4046" stroke-width="0.4" stroke-linejoin="round"/>
+
+  <!-- Subtle highlight stripe down the centerline of the shank -->
+  <line x1="16" y1="8.5" x2="16" y2="21.5" stroke="#eef0f3" stroke-width="0.6" opacity="0.55"/>
+
+  <!-- Subtle head highlight -->
+  <ellipse cx="14" cy="6.2" rx="2" ry="0.4" fill="#eef0f3" opacity="0.7"/>
 </svg>
