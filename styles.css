@@ -867,21 +867,29 @@ html, body {
 
 /* ===== Contact ===== */
 .contact {
-  /* Navy gradient backdrop behind the form — uses the same brand navy
-     (#1f3a5f → #0e1623) as the cta-band and footer so the form section
-     reads as part of one cohesive palette. The form card itself stays
-     white on top so the fields stay legible. */
+  /* Light, near-white background across the whole section — the navy
+     sits only behind the form card, not under the contact info. */
+  background: var(--color-surface);
+}
+
+/* Navy gradient lives behind ONLY the form card, not under the
+   contact-info column. Implemented as a padding-box on the right
+   column plus a negative-margin banner so the navy wraps the form
+   (and the map below it) without bleeding into the left column. */
+.contact-right {
+  position: relative;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  /* Navy gradient + blueprint grid behind the form only */
   background:
     radial-gradient(ellipse at top right, rgba(31, 107, 214, 0.32) 0%, transparent 55%),
     radial-gradient(ellipse at bottom left, rgba(200, 127, 58, 0.12) 0%, transparent 50%),
     linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   color: #ffffff;
-  position: relative;
   overflow: hidden;
 }
-.contact::before {
-  /* Subtle blueprint grid pattern overlay — nods to construction plans
-     without competing with the form. */
+.contact-right::before {
+  /* Subtle blueprint grid pattern — sits behind the form card */
   content: '';
   position: absolute;
   inset: 0;
@@ -890,21 +898,14 @@ html, body {
     linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 56px 56px;
   pointer-events: none;
+  border-radius: var(--radius-lg);
 }
-.contact > .container { position: relative; z-index: 1; }
-/* On the navy backdrop, the eyebrow + section-title read in white */
-.contact .eyebrow { color: #f4c590; }
-.contact .section-title { color: #ffffff; }
-.contact .contact-info > p { color: rgba(255,255,255,0.78); }
-/* Contact list items: translucent divider lines so they read on navy */
-.contact .contact-item { border-top-color: rgba(255,255,255,0.10); }
-.contact .contact-item:last-child { border-bottom-color: rgba(255,255,255,0.10); }
-.contact .contact-item strong { color: #ffffff; }
-.contact .contact-item span { color: rgba(255,255,255,0.72); }
-.contact .contact-item a { color: #ffffff; }
-.contact .contact-item a:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
-/* Form labels stay navy on the white card (already covered by the
-   .contact-form rule), so no change needed there. */
+.contact-right > * { position: relative; z-index: 1; }
+/* Map card sits on the same navy backdrop — give it a slight lift */
+.contact-right .map-card {
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 8px 24px rgba(8, 16, 28, 0.35);
+}
 
 .contact-grid {
   display: grid;
