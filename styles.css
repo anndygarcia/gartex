@@ -901,6 +901,30 @@ html, body {
   border-radius: var(--radius-lg);
 }
 .contact-right > * { position: relative; z-index: 1; }
+
+/* "Contact Form" heading above the white form card. Sits on the navy
+   backdrop so it reads in white; centered to anchor the form. */
+.form-heading {
+  text-align: center;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.015em;
+  margin: 4px 4px 22px;
+  /* Brand-blue underline accent — same banner-blue as the promo bar
+     and form-focus ring, tying the heading visually to the form. */
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.16);
+}
+.form-heading::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin: 14px auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #1e90ff 0%, #1f6bd6 100%);
+}
 /* Map card sits on the same navy backdrop — give it a slight lift */
 .contact-right .map-card {
   border-color: rgba(255,255,255,0.15);
