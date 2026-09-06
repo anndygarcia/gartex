@@ -1192,10 +1192,12 @@ html, body {
     transform: translateY(-30%) rotate(-135deg);
   }
 
-  /* Dropdown panel: nested inline list (NOT absolute). Stays in flow. */
-  .nav-dropdown {
-    position: static;
-    transform: none;
+  /* Dropdown panel: nested inline list (NOT absolute). Stays in flow.
+     Use `!important` on a few properties to defeat the desktop dropdown
+     rules later in the file (same specificity → source order wins). */
+  .nav-links .nav-dropdown {
+    position: static !important;
+    transform: none !important;
     min-width: 0;
     width: 100%;
     background: var(--color-surface);
@@ -1205,16 +1207,16 @@ html, body {
     box-shadow: none;
     padding: 0;
     display: block;
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important;
+    visibility: visible !important;
     pointer-events: auto;
     transition: max-height 0.25s ease;
     max-height: 0;
     overflow: hidden;
   }
-  .nav-dropdown::before { display: none; }
+  .nav-links .nav-dropdown::before { display: none !important; }
   .nav-item.has-dropdown.open > .nav-dropdown {
-    max-height: 320px;
+    max-height: 320px !important;
   }
   .nav-dropdown a {
     padding: 14px 24px 14px 40px;
