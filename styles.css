@@ -1232,10 +1232,16 @@ html, body {
     color: var(--color-primary);
   }
 
-  /* Bring the primary CTA INTO the open menu, since the desktop one is hidden */
+  /* Bring the primary CTA INTO the open menu, since the desktop one is hidden.
+     Width uses calc so 20px gutters on both sides come out even at any
+     phone width — never crops past the screen edge. The block wrapper
+     centers it horizontally inside the drawer. */
   .nav-cta { display: none; }
   .nav-links a.mobile-cta {
-    margin: 16px 20px 24px;
+    align-self: stretch;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
+    margin: 20px 20px 28px;
     padding: 14px 22px;
     text-align: center;
     justify-content: center;
@@ -1244,6 +1250,13 @@ html, body {
     color: #fff;
     background: var(--color-primary);
     font-weight: 600;
+    font-size: 15.5px;
+    letter-spacing: 0.01em;
+    min-height: 52px;
+    /* Override the generic .nav-links > * { width: 100%; display: block }
+       above — that rule would otherwise make the link 100% and add 20px
+       margins on top, pushing it 40px past the right edge. */
+    max-width: calc(100% - 40px);
   }
   .nav-links a.mobile-cta:hover { background: var(--color-accent); }
 
