@@ -19,7 +19,73 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=nailcursor5">
+
+  <!-- ===== SEO / social sharing ===== -->
+  <!-- Cache-buster notes:
+       styles.css bumps ?v= on each CSS change (?v=seo1 here).
+       The main favicon uses a fresh filename (icon.png) so no edge
+       cache can hold a stale 404 for it. -->
+  <link rel="canonical" href="https://gartex-construction.com/">
+  <meta name="theme-color" content="#1f3a5f">
+  <link rel="icon" type="image/png" href="assets/favicons/icon.png">
+
+  <!-- Open Graph (Facebook, iMessage, LinkedIn, Slack…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Gartex Construction Company">
+  <meta property="og:url" content="https://gartex-construction.com/">
+  <meta property="og:title" content="Gartex Construction Company | Custom Framing & Cornice in Houston, TX">
+  <meta property="og:description" content="Precision framing and custom cornice work for high-end custom home builds across Houston, Texas. Free estimates — licensed & insured.">
+  <meta property="og:image" content="https://gartex-construction.com/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Gartex Construction Company — Custom Framing & Cornice, Houston TX">
+
+  <!-- Twitter/X card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Gartex Construction Company | Custom Framing & Cornice in Houston, TX">
+  <meta name="twitter:description" content="Precision framing and custom cornice work for high-end custom home builds across Houston, Texas. Free estimates — licensed & insured.">
+  <meta name="twitter:image" content="https://gartex-construction.com/assets/og-image.jpg">
+
+  <!-- Structured data: tells Google this is a local Houston contractor
+       with phone, hours, and the exact service-area list from the page. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "GeneralContractor",
+    "name": "Gartex Construction Company",
+    "url": "https://gartex-construction.com/",
+    "image": "https://gartex-construction.com/assets/og-image.jpg",
+    "logo": "https://gartex-construction.com/assets/logo/g-mark-v2.png",
+    "description": "Gartex Construction Company specializes in custom framing and cornice work for high-end custom home builds across Houston, Texas.",
+    "telephone": "+1-713-703-6355",
+    "email": "Gartexbuilders@gmail.com",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Houston",
+      "addressRegion": "TX",
+      "addressCountry": "US"
+    },
+    "areaServed": [
+      "Houston TX", "Katy TX", "Sugar Land TX", "The Woodlands TX",
+      "Spring TX", "Cypress TX", "Pearland TX", "Missouri City TX",
+      "Memorial TX", "The Heights TX", "River Oaks TX", "West University TX",
+      "Bellaire TX", "Meyerland TX", "Tanglewood TX", "Montrose TX",
+      "Friendswood TX", "Tomball TX"
+    ],
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "07:00",
+        "closes": "17:00"
+      }
+    ],
+    "sameAs": []
+  }
+  </script>
+
+  <link rel="stylesheet" href="styles.css?v=seo1">
 </head>
 <body>
 
