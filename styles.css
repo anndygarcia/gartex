@@ -1478,3 +1478,223 @@ html, body {
   transition: color 0.15s, border-color 0.15s;
 }
 .service-link:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+
+/* =========================================================
+   NAV DROPDOWN — Services tab shows all 3 service pages
+   ========================================================= */
+.nav-item { position: relative; }
+.nav-drop-toggle { cursor: pointer; }
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 8px);
+  min-width: 240px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 32px rgba(8,16,28,0.10), 0 2px 4px rgba(8,16,28,0.04);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+  z-index: 90;
+}
+.nav-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-top: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+}
+.nav-dropdown a {
+  font-size: 14px;
+  color: var(--color-text-mid);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  transition: background-color 0.12s, color 0.12s;
+}
+.nav-dropdown a:hover {
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+@media (min-width: 901px) {
+  .nav-item.has-dropdown:hover > .nav-dropdown,
+  .nav-item.has-dropdown:focus-within > .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, 4px);
+  }
+}
+
+/* =========================================================
+   TRUST STRIP — appears directly under the hero on service pages
+   ========================================================= */
+.trust-strip {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #ffffff;
+  padding: 32px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.t-icon {
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  background: rgba(244, 197, 144, 0.16);
+  border: 1px solid rgba(244, 197, 144, 0.32);
+  border-radius: 12px;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.trust-item strong {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+}
+.trust-item span {
+  display: block;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.72);
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 900px) {
+  .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+}
+@media (max-width: 600px) {
+  .trust-strip { padding: 26px 0; }
+  .trust-grid { grid-template-columns: 1fr; gap: 14px; }
+  .trust-item { background: rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; }
+}
+
+/* =========================================================
+   SCROLL REVEAL — fade up
+   ========================================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* =========================================================
+   FOOTER SERVICES ROW — internal-link pass between service pages
+   ========================================================= */
+.footer-services {
+  font-size: 13px !important;
+  color: #94a3b8 !important;
+  margin-top: 12px !important;
+  max-width: 460px;
+}
+.footer-services a {
+  color: #cbd5e1;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.footer-services a:hover {
+  color: #f4c590;
+  border-bottom-color: var(--color-accent);
+}
+
+/* =========================================================
+   STICKY MOBILE CTA — bottom-right pill on phones, hides near form
+   ========================================================= */
+.sticky-cta {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  background: var(--color-primary);
+  color: #ffffff;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 8px 24px rgba(8,16,28,0.28), 0 2px 4px rgba(8,16,28,0.18);
+  z-index: 95;
+  display: none;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.sticky-cta:hover { background: var(--color-accent); }
+@media (max-width: 900px) {
+  body.has-sticky-cta .sticky-cta { display: inline-flex; }
+}
+/* Hide sticky CTA when the contact section is on screen — avoids
+   double-prompts on the form itself. */
+body.has-sticky-cta .sticky-cta.is-near-form { opacity: 0; pointer-events: none; transform: translateY(20px); }
+.sticky-cta { transition: opacity 0.25s ease, transform 0.25s ease, background-color 0.15s; }
+
+/* =========================================================
+   HERO STATS PATCH — larger, with subtle dividers between them
+   ========================================================= */
+.subhero .hero-stats {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.subhero .stat strong {
+  font-size: 40px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.subhero .stat span {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.78);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+@media (max-width: 600px) {
+  .subhero .hero-stats { gap: 22px 28px; }
+  .subhero .stat strong { font-size: 30px; }
+}
+
+/* =========================================================
+   SUBHERO TALLER ON SERVICE PAGES — give the photo + stats room
+   ========================================================= */
+.subhero { min-height: 72vh; }
+@media (max-width: 900px) { .subhero { min-height: 64vh; } }
+@media (max-width: 600px) { .subhero { min-height: 70vh; } }
+
+/* =========================================================
+   "PROJECT PROOF" SECTION on subpages — same look as homepage projects
+   ========================================================= */
+.projects .section-sub { margin-bottom: 36px; }
+
+/* =========================================================
+   CTA BAND — bigger on service pages, less cramped
+   ========================================================= */
+.cta-inner h2 { font-size: 30px; }
+.cta-inner p { font-size: 16.5px; }

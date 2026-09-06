@@ -81,11 +81,20 @@
         "closes": "17:00"
       }
     ],
-    "sameAs": []
+    "sameAs": [],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Gartex Construction Services",
+      "itemListElement": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom Home Framing", "url": "https://gartex-construction.com/framing-houston/" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom Cornice & Crown Molding", "url": "https://gartex-construction.com/cornice-houston/" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom Home Builds", "url": "https://gartex-construction.com/custom-home-builds-houston/" } }
+      ]
+    }
   }
   </script>
 
-  <link rel="stylesheet" href="styles.css?v=seo1">
+  <link rel="stylesheet" href="styles.css?v=svcnav1">
 </head>
 <body>
 
@@ -109,7 +118,14 @@
         <span class="logo-text">GARTEX<span class="logo-thin">CONSTRUCTION</span></span>
       </a>
       <nav class="nav-links" id="navLinks">
-        <a href="#services">Services</a>
+        <div class="nav-item has-dropdown">
+          <a href="#services" class="nav-drop-toggle" aria-haspopup="true" aria-expanded="false">Services</a>
+          <div class="nav-dropdown">
+            <a href="/framing-houston/">Custom Home Framing</a>
+            <a href="/cornice-houston/">Cornice &amp; Crown Molding</a>
+            <a href="/custom-home-builds-houston/">Custom Home Builds</a>
+          </div>
+        </div>
         <a href="#projects">Projects</a>
         <a href="#about">About</a>
         <a href="#service-areas">Areas</a>
@@ -182,6 +198,7 @@
             <li>Interior & exterior trim</li>
             <li>Architectural details</li>
           </ul>
+          <a href="/cornice-houston/" class="service-link">Custom cornice &amp; crown molding in Houston, TX →</a>
         </div>
 
         <div class="service-card">
@@ -194,6 +211,7 @@
             <li>GC & homeowner partnerships</li>
             <li>Project coordination</li>
           </ul>
+          <a href="/custom-home-builds-houston/" class="service-link">Custom home builds in Houston, TX →</a>
         </div>
       </div>
     </div>
