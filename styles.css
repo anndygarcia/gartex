@@ -1253,3 +1253,228 @@ html, body {
 
   .btn { padding: 13px 18px; font-size: 14.5px; }
 }
+/* =========================================================
+   SUBPAGE LAYOUTS (framing-houston/ etc.)
+   Reuses tokens above — navy + gold, same card/btn language
+   ========================================================= */
+
+/* Subpage hero — image + dark navy overlay, left-aligned copy */
+.subhero {
+  position: relative;
+  min-height: 62vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  color: #fff;
+  isolation: isolate;
+}
+.subhero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+.subhero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8,16,28,0.45) 0%, rgba(8,16,28,0.55) 55%, rgba(8,16,28,0.82) 100%),
+    linear-gradient(90deg, rgba(8,16,28,0.55) 0%, rgba(8,16,28,0.15) 60%, rgba(8,16,28,0.05) 100%);
+  z-index: -1;
+}
+.subhero-content {
+  width: 100%;
+  padding-top: 120px;
+  padding-bottom: 72px;
+}
+.crumbs {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 22px;
+  letter-spacing: 0.02em;
+}
+.crumbs a {
+  color: rgba(255,255,255,0.85);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s, color 0.15s;
+}
+.crumbs a:hover { color: #fff; border-bottom-color: var(--color-accent); }
+.subhero-title {
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  max-width: 760px;
+  margin-bottom: 18px;
+  color: #fff;
+}
+.subhero-sub {
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.85);
+  max-width: 560px;
+  margin-bottom: 28px;
+}
+
+/* Narrow reading column for the intro copy */
+.content-narrow { max-width: 780px; }
+.content-narrow p {
+  font-size: 16.5px;
+  color: var(--color-text-mid);
+  margin-bottom: 16px;
+}
+
+/* Image + checklist split block */
+.split-media {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  margin: 72px 0;
+}
+.split-figure {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-hover);
+}
+.split-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  transition: transform 0.6s ease;
+}
+.split-figure:hover img { transform: scale(1.03); }
+.split-title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-bottom: 20px;
+}
+.checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.checklist li {
+  font-size: 15.5px;
+  color: var(--color-text-mid);
+  padding-left: 30px;
+  position: relative;
+}
+.checklist li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #f4c590;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 5px;
+}
+
+/* FAQ — native <details>, no JS needed */
+.faq-section { background: var(--color-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+.faq { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.faq details {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  transition: border-color 0.15s ease;
+}
+.faq details[open] { border-color: var(--color-primary); box-shadow: var(--shadow-card); }
+.faq summary {
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  padding-right: 36px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+.faq details[open] summary::after {
+  content: '–';
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.faq details p {
+  margin-top: 14px;
+  font-size: 15.5px;
+  color: var(--color-text-muted);
+}
+
+/* Process block spacing on subpages */
+.process-block { margin-top: 72px; }
+.process-block .section-title { margin-bottom: 40px; }
+
+/* CTA band actions stack on the right */
+.cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Footer self-link to the service page (helps internal linking) */
+.footer-self {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: #94a3b8;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.footer-self:hover { color: #f4c590; border-bottom-color: var(--color-accent); }
+
+/* Subpage responsive */
+@media (max-width: 900px) {
+  .subhero { min-height: 56vh; }
+  .subhero-content { padding-top: 100px; padding-bottom: 56px; }
+  .split-media { grid-template-columns: 1fr; gap: 32px; margin: 56px 0; }
+  .process-block { margin-top: 56px; }
+}
+@media (max-width: 600px) {
+  .subhero { min-height: 64vh; }
+  .subhero-content { padding-bottom: 48px; }
+  .subhero-sub { font-size: 15.5px; }
+  .faq details { padding: 16px 18px; }
+  .cta-actions { flex-direction: column; width: 100%; }
+  .cta-actions .btn { width: 100%; }
+}
+
+/* Service card deep-link to the matching SEO subpage */
+.service-link {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.service-link:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
