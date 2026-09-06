@@ -602,8 +602,11 @@
 
       toggle.addEventListener('click', () => setOpen(!isOpen()));
 
-      // Close on link click (so anchor scroll feels right)
+      // Close on link click (so anchor scroll feels right), but NOT on
+      // the dropdown toggle — that's handled separately to expand the
+      // nested Services accordion instead of navigating.
       nav.querySelectorAll('a').forEach(a => {
+        if (a.classList.contains('nav-drop-toggle')) return;
         a.addEventListener('click', () => { if (isOpen()) setOpen(false); });
       });
 
