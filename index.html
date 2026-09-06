@@ -628,6 +628,20 @@
       });
     })();
 
+    // Services dropdown — desktop shows on hover (CSS); mobile tap toggles
+    (() => {
+      const t = document.querySelector('.nav-drop-toggle');
+      if (!t) return;
+      t.addEventListener('click', (e) => {
+        if (window.innerWidth <= 900) {
+          e.preventDefault();
+          const item = t.parentElement;
+          const open = item.classList.toggle('open');
+          t.setAttribute('aria-expanded', String(open));
+        }
+      });
+    })();
+
     // Contact form — POST to /api/lead (CF Pages Function). Email is
     // sent to Gartexbuilders@gmail.com via Resend; the user never has
     // to leave the page or open their mail client.
