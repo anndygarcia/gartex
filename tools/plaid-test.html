@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!--
+  Plaid Link test harness — NOT linked from any page on the site.
+
+  Intentionally parked in tools/ rather than deployed as a site page: this
+  page holds an admin token in the browser and talks to the financial API.
+  There is no index.html route to it from the marketing site, and the file is
+  excluded from sitemap.xml.
+
+  How to use:
+    1. Open  /tools/plaid-test.html  in a browser.
+    2. Paste the PLAID_ADMIN_TOKEN you set in CF Pages.
+    3. Click "Connect a bank" -> Plaid Link opens -> pick a sandbox bank.
+    4. Pick any test credentials Plaid lists (e.g. user_good / pass_good).
+  Accounts/transactions that come back are Sandbox fakes, not real money.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Plaid Link test (Gartex)</title>
+<style>
+  body { font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 860px; margin: 0 auto; padding: 32px 24px; color: #16202c; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .sub { color: #5b6b7d; margin: 0 0 28px; font-size: 14px; }
+  .warn { background: #fff8e1; border-left: 4px solid #f0b429; padding: 12px 16px;
+          margin: 0 0 24px; border-radius: 0 6px 6px 0; font-size: 14px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
+  input { width: 100%; box-sizing: border-box; padding: 11px 13px; font-size: 16px;
+          border: 1px solid #cdd7e2; border-radius: 8px; font-family: ui-monospace, monospace; }
+  button { margin-top: 18px; padding: 13px 22px; font-size: 15px; font-weight: 600;
+           border: 0; border-radius: 8px; background: #1f6bd6; color: #fff; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  #status { margin: 20px 0; padding: 12px 16px; border-radius: 8px; font-size: 14px;
+            background: #eef2f7; white-space: pre-wrap; }
+  #status.err { background: #fdecec; color: #96231f; }
+  #status.ok { background: #e8f6ee; color: #1a6b3c; }
+  pre { background: #16202c; color: #dfe8f2; padding: 16px; border-radius: 8px;
+        overflow-x: auto; font-size: 12.5px; line-height: 1.5; }
+  h2 { font-size: 17px; margin: 32px 0 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #e3e9f0; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #5b6b7d; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<h1>Plaid Link test</h1>
+<p class="sub">Sandbox harness for the Gartex Plaid Functions. Not linked from the site.</p>
+
+<div class="warn">
+  <strong>Sandbox only.</strong> This connects to Plaid's test environment with
+  fake institutions and test credentials. No real bank, no real money.
+</div>
+
+<label for="tok">PLAID_ADMIN_TOKEN</label>
+<input id="tok" type="password" placeholder="the value you set in CF Pages" autocomplete="off">
+
+<div class="row">
+  <button id="linkBtn">Connect a bank</button>
+  <button id="acctBtn" disabled>Read accounts &amp; transactions</button>
+</div>
+
+<div id="status">Paste the admin token to begin.</div>
+
+<div id="out"></div>
+
+<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+let handler = null;
+
+function say(msg, cls) {
+  const el = $('#status');
+  el.textContent = msg;
+  el.className = cls || '';
+}
+
+function post(path, body) {
+  return fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-plaid-token': $('#tok').value.trim() },
+    body: JSON.stringify(body || {}),
+  }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+}
+
+// Build the Link handler fresh per click — reusing a configured handler
+// throws, and a stale one silently re-uses the previous session.
+$('#linkBtn').addEventListener('click', async () => {
+  const token = $('#tok').value.trim();
+  if (!token) return say('Paste the admin token first.', 'err');
+
+  $('#linkBtn').disabled = true;
+  say('Requesting a Link token…');
+  const r = await post('/api/plaid/link');
+
+  if (r.status !== 200) {
+    $('#linkBtn').disabled = false;
+    return say('Could not start Link (HTTP ' + r.status + ')\n' +
+                (r.body.error || '') + (r.body.detail ? '\n' + r.body.detail : ''), 'err');
+  }
+
+  say('Link token received — opening Plaid Link…');
+  handler = window.Plaid.create({
+    token: r.body.link_token,
+    onSuccess: async (publicToken, meta) => {
+      say('Bank linked. Exchanging token…', 'ok');
+      const ex = await post('/api/plaid/exchange', { public_token: publicToken });
+      if (ex.status !== 200) {
+        return say('Exchange failed (HTTP ' + ex.status + ')\n' +
+                    (ex.body.error || '') + (ex.body.detail ? '\n' + ex.body.detail : ''), 'err');
+      }
+      $('#acctBtn').disabled = false;
+      say(ex.body.warning
+            ? 'Linked, but WARNING:\n' + ex.body.warning
+            : 'Linked and stored. Click "Read accounts & transactions".', 'ok');
+      await loadAccounts();
+    },
+    onExit: (err) => {
+      if (err) say('Link closed: ' + (err.display_message || err.error_code), 'err');
+      $('#linkBtn').disabled = false;
+      if (!$('#status').className) say('Link closed before finishing.');
+    },
+  });
+  handler.open();
+});
+
+async function loadAccounts() {
+  say('Reading accounts…');
+  const r = await post('/api/plaid/accounts', { days: 30 });
+  if (r.status !== 200) {
+    return say('HTTP ' + r.status + '\n' + (r.body.error || '') +
+                (r.body.detail ? '\n' + r.body.detail : ''), 'err');
+  }
+  const b = r.body;
+  const money = (n) => n === null ? '—' : '$' + Number(n).toFixed(2);
+
+  let html = '<h2>Accounts (' + b.accounts.length + ')</h2><table>' +
+    '<tr><th>Name</th><th>Type</th><th>Mask</th><th>Available</th><th>Current</th></tr>';
+  for (const a of b.accounts) {
+    html += '<tr><td>' + esc(a.name) + '</td><td>' + esc(a.subtype || a.type) +
+            '</td><td>' + esc(a.mask || '—') + '</td><td class="num">' + money(a.balances.available) +
+            '</td><td class="num">' + money(a.balances.current) + '</td></tr>';
+  }
+  html += '</table>';
+
+  html += '<h2>Recent transactions (' + b.transactions.length + ')</h2>';
+  if (b.transactions_note) {
+    html += '<div class="warn">Transactions unavailable: ' + esc(b.transactions_note) + '</div>';
+  }
+  html += '<table><tr><th>Date</th><th>Name</th><th>Category</th><th>Amount</th></tr>';
+  for (const t of b.transactions) {
+    html += '<tr><td>' + esc(t.date) + '</td><td>' + esc(t.name) +
+            (t.pending ? ' <em>(pending)</em>' : '') + '</td><td>' + esc(t.category || '—') +
+            '</td><td class="num">' + money(t.amount) + '</td></tr>';
+  }
+  html += '</table>';
+
+  $('#out').innerHTML = html;
+  say('item_id: ' + b.item_id + '  ·  linked: ' + (b.linked_at || '—'), 'ok');
+}
+
+$('#acctBtn').addEventListener('click', loadAccounts);
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+</script>
+</body>
+</html>
