@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Internal tooling — never index
+Disallow: /network
+Disallow: /apply
+
 Sitemap: https://gartex-construction.com/sitemap.xml
