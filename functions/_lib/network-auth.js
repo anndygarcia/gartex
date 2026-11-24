@@ -62,6 +62,20 @@ async function verify(secret, payload, signature) {
     atob(signature.replace(/-/g, '+').replace(/_/g, '/')),
     (c) => c.charCodeAt(0),
   );
+  // Reject NON-CANONICAL base64url.
+  //
+  // A 32-byte HMAC encodes to 43 base64url characters, and the LAST
+  // character carries only 2 significant bits — the other 4 bits are
+  // padding. That means FOUR different strings decode to the exact same
+  // 32 bytes. Without this check, anyone holding one valid signature
+  // could mint three more equally-valid cookies, and the "tampered
+  // cookie is rejected" property of the gate does not hold.
+  //
+  // So: re-encode what we decoded and require it to match the input
+  // byte-for-byte. Only the canonical encoding is accepted.
+  const canonical = b64url(sigBytes);
+  if (canonical !== signature) return false;
+
   return crypto.subtle.verify('HMAC', key, sigBytes, new TextEncoder().encode(payload));
 }
 
@@ -165,3 +179,14 @@ export async function requireAuthPage(request, env) {
 }
 
 export { json, COOKIE_NAME, timingSafeEqual };
+
+// Exported for the test suite: sign and verify a session signature
+// directly, so the canonical-base64url rule can be asserted without
+// going through a live HTTP round trip.
+export async function signSession(secret, payload) {
+  return sign(secret, payload);
+}
+
+export async function verifySession(secret, payload, signature) {
+  return verify(secret, payload, signature);
+}
