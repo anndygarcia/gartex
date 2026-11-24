@@ -143,6 +143,8 @@ export function dashboardHtml() {
     <div class="tab" data-view="activity">Activity</div>
   </nav>
 
+  <div id="banner" style="display:none"></div>
+
   <div class="grid kpis" id="kpis"></div>
 
   <div id="view-board">
@@ -205,6 +207,10 @@ export function loginHtml(next) {
   button{width:100%;background:${BRAND_ACCENT};border:0;color:#1a1206;font-weight:700;font-size:14.5px;padding:12px;border-radius:8px;cursor:pointer;font-family:inherit}
   button:hover{filter:brightness(1.08)}
   .err{background:rgba(255,107,107,.13);border:1px solid rgba(255,107,107,.4);color:#ffb3b3;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:16px}
+  .banner{margin:0 0 18px;padding:14px 16px;border-radius:10px;font-size:14px;line-height:1.5}
+  .banner.err{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.42);margin-bottom:18px}
+  .banner .banner-title{font-weight:700;color:#ffb3b3;font-size:14px;margin-bottom:5px}
+  .banner .banner-detail{color:#d7dee9;opacity:.92;font-size:13px}
   .foot{margin-top:18px;font-size:11.5px;color:#93a4bf;text-align:center;line-height:1.5}
 </style>
 </head>

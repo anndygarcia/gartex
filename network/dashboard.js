@@ -55,6 +55,23 @@ async function api(path, options) {
 }
 
 // ── rendering ──────────────────────────────────────────────────────────
+function showBanner(msg, detail) {
+  const b = $('#banner');
+  if (!b) return;
+  b.style.display = '';
+  b.className = 'banner err';
+  b.innerHTML =
+    `<div class="banner-title">${esc(msg)}</div>` +
+    (detail ? `<div class="banner-detail">${esc(detail)}</div>` : '');
+}
+
+function clearBanner() {
+  const b = $('#banner');
+  if (!b) return;
+  b.style.display = 'none';
+  b.innerHTML = '';
+}
+
 function renderKpis(stats) {
   const box = $('#kpis');
   box.innerHTML = '';
@@ -205,6 +222,8 @@ async function load() {
       api('/api/network/stats'),
       api('/api/network/log'),
     ]);
+    if (leads === null || stats === null || log === null) return;  // redirected
+    clearBanner();
     LEADS = leads && leads.leads ? leads.leads : [];
     const s = (stats && stats.stats) || {};
     renderKpis(s);
@@ -213,7 +232,25 @@ async function load() {
     renderFunnel(s);
     renderFeed(log && log.log);
   } catch (e) {
-    toast('Load failed: ' + e.message);
+    // A failed load must SAY SO. A toast disappears in 2.4s and leaves a
+    // blank page behind, which reads as "no leads yet" — the opposite of
+    // the truth. The API's own message explains what is missing.
+    const msg = String(e && e.message ? e.message : e);
+    const isConfig = /not configured|AIRTABLE/i.test(msg);
+    showBanner(
+      isConfig ? 'Database not connected' : 'Could not load the dashboard',
+      isConfig
+        ? msg + '  — the lead database is offline until Airtable is connected in Cloudflare Pages environment variables.'
+        : msg
+    );
+    // Also keep the KPI row honest: show a dash rather than zeros, so a
+    // missing backend never reads as "0 leads".
+    const box = $('#kpis');
+    if (box && !box.children.length) {
+      box.innerHTML = '<div class="kpi"><div class="label">Total leads</div>' +
+        '<div class="value">—</div><div class="sub">not loaded</div></div>';
+    }
+    toast('Load failed: ' + msg);
   }
 }
 
