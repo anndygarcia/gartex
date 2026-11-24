@@ -310,7 +310,19 @@ export function intakeHtml(lang = 'en') {
 <script>
 (function(){
   var form=document.getElementById('form'),msg=document.getElementById('msg'),btn=document.getElementById('submitBtn');
-  var lp=new URLSearchParams(location.search).get('lang');
+  var params=new URLSearchParams(location.search);
+  var lp=params.get('lang');
+  // The intake token identifies WHICH lead this submission belongs to.
+  // It is issued by the sweep with the marketplace message, so the form
+  // can attach the vetting answers to the lead we already tracked
+  // instead of creating a duplicate row. It must survive the language
+  // toggle, or the Spanish form loses the link back to the lead.
+  var tok=params.get('t')||'';
+  if(tok){
+    var tf=document.createElement('input');
+    tf.type='hidden';tf.name='Intake Token';tf.value=tok;
+    form.appendChild(tf);
+  }
   if(lp==='es'||lp==='en'){
     var u=new URL(location.href);u.searchParams.set('lang',lp==='es'?'en':'es');
     document.getElementById('langBtn').href=u.toString();

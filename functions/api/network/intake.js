@@ -8,7 +8,7 @@
 // whitelist. The Airtable token stays server-side.
 
 import { json } from '../../_lib/network-auth.js';
-import { createRecord, isConfigured, tableIds } from '../../_lib/airtable.js';
+import { createRecord, findByToken, isConfigured, tableIds, updateRecord } from '../../_lib/airtable.js';
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB per file
 const MAX_FILES = 6;
@@ -177,8 +177,41 @@ export async function onRequestPost({ request, env }) {
 
   try {
     const { leads, log } = tableIds(env);
-    const created = await createRecord(env, leads, lead);
-    const recId = created.id;
+
+    // If the message we sent carried an intake token, this submission
+    // belongs to a lead we ALREADY have (the Marketplace row). Update
+    // that row instead of creating a second one — otherwise every
+    // contractor who fills in the form becomes a duplicate of the lead
+    // we already tracked, and the vetting data lands on the wrong row.
+    const token = String(raw['Intake Token'] || raw.token || '').trim();
+    let recId = null;
+    let existing = null;
+    if (token) {
+      try {
+        existing = await findByToken(env, leads, token);
+      } catch (e) {
+        // A lookup failure must not lose the submission — fall through
+        // and create the record.
+        existing = null;
+      }
+    }
+
+    if (existing && existing.id) {
+      recId = existing.id;
+      // Merge: the form's answers win, but keep the marketplace fields
+      // (listing URL, seller profile, specialty, trades) that the form
+      // does not know about.
+      const merged = { ...(existing.fields || {}), ...lead };
+      merged.Status = 'Form submitted';
+      if (!merged.Source) merged.Source = 'Marketplace';
+      // The name on the form is usually better than the marketplace
+      // display name (which can be a first name only).
+      await updateRecord(env, leads, recId, merged);
+    } else {
+      if (token) lead['Intake Token'] = token;
+      const created = await createRecord(env, leads, lead);
+      recId = created.id;
+    }
 
     // Attach documents. Airtable needs a public URL for attachments, so we
     // upload to the attachment endpoint after creating the record.
