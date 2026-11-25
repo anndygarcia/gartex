@@ -15,7 +15,7 @@
 // lead store validates that shape too, but it is checked here as well so
 // a hostile name never even leaves the edge.
 
-import { requireAuth } from '../../_lib/network-auth.js';
+import { requireAuth } from '../../../_lib/network-auth.js';
 
 const STORED_NAME = /^[0-9a-f]{8}_[A-Za-z0-9._-]{1,120}$/;
 
