@@ -101,3 +101,27 @@ file may ever be committed. Secrets live only in Cloudflare Pages
 environment variables and in the local `~/.hermes/.env` (mode 600). The
 SQLite lead store lives outside the repo at
 `~/Gartex-Subcontractor-DB/leads.db`.
+
+
+## The intake form (2026-11-25)
+
+`/apply` is the public bilingual intake form. It is deliberately SHORT:
+4 required fields (name, phone, trades, specialty), trade and county
+checkboxes rendered as tappable chips, and every vetting field (COI,
+W-9, legal entity, pricing, references, photos) behind a collapsed
+`<details>` block so it never blocks the first response.
+
+Email is optional. A trade contractor reached through Marketplace often
+has no email set up, and requiring one pushed the good ones out of the
+form.
+
+**Framing rule:** nothing a sub can read may mention a network. The form
+and the outreach message both present Gartex as a builder reaching out to
+contract a trade crew for upcoming projects — a qualifying inquiry, not a
+signup. The word "network" and "red de subcontratistas" are banned from
+the EN/ES message templates, the form-link reply, both follow-ups, and
+every visible string on the form. `test_engine_safety.py` section 13
+enforces this against the templates AND the rendered messages.
+
+The internal dashboard at `/network/` is auth-gated and may still use the
+network wording — it is Anndy-only.
