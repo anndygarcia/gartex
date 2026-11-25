@@ -236,11 +236,11 @@ async function load() {
     // blank page behind, which reads as "no leads yet" — the opposite of
     // the truth. The API's own message explains what is missing.
     const msg = String(e && e.message ? e.message : e);
-    const isConfig = /not configured|AIRTABLE/i.test(msg);
+    const isConfig = /not configured|LEADS_API/i.test(msg);
     showBanner(
       isConfig ? 'Database not connected' : 'Could not load the dashboard',
       isConfig
-        ? msg + '  — the lead database is offline until Airtable is connected in Cloudflare Pages environment variables.'
+        ? msg + '  — the lead database is offline until LEADS_API_URL and LEADS_API_SECRET are connected in Cloudflare Pages environment variables.'
         : msg
     );
     // Also keep the KPI row honest: show a dash rather than zeros, so a

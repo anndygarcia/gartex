@@ -1,14 +1,14 @@
 // POST /api/network/intake  →  public intake-form submission.
 //
-// Creates a lead row in Airtable (status "Form submitted"), attaches the
-// uploaded COI/W-9/photos, and emails Anndy a notification.
+// Creates a lead row in the local lead store (status "Form submitted"),
+// attaches the uploaded COI/W-9/photos, and emails Anndy a notification.
 //
 // This endpoint is public by design (subs fill the form), so it is
 // hardened: honeypot, per-IP rate limit, size caps, and a strict field
-// whitelist. The Airtable token stays server-side.
+// whitelist. The lead-store secret stays server-side.
 
 import { json } from '../../_lib/network-auth.js';
-import { createRecord, findByToken, isConfigured, tableIds, updateRecord } from '../../_lib/airtable.js';
+import { createRecord, findByToken, isConfigured, storeBase, storeHeaders, tableIds, updateRecord } from '../../_lib/leadstore.js';
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB per file
 const MAX_FILES = 6;
@@ -32,7 +32,7 @@ const TEXT_FIELDS = [
   'Crew Size', 'Insured', 'Insurance Carrier', 'Policy Number', 'Coverage',
   'COI Expiry', 'Workers Comp', 'Entity Registered', 'Legal Entity', 'EIN',
   'Capacity', 'When Could You Start', 'Pricing Model', 'Payment Terms',
-  'License Numbers', 'Travel', 'References', 'Notes', 'Lang',
+  'License Numbers', 'Travel', 'References', 'Notes', 'Language',
 ];
 
 const NUMERIC = new Set(['Years In Business', 'Crew Size']);
@@ -79,7 +79,7 @@ async function sendNotification(env, lead, files) {
     ['Travel', lead['Travel']],
     ['References', lead['References']],
     ['Notes', lead['Notes']],
-    ['Language', lead['Lang']],
+    ['Language', lead['Language']],
   ];
 
   const htmlRows = rows
@@ -153,10 +153,10 @@ export async function onRequestPost({ request, env }) {
   }
 
   if (!isConfigured(env)) {
-    return json({ error: 'Server not configured (missing AIRTABLE_PAT / AIRTABLE_BASE_ID).' }, 503);
+    return json({ error: 'Server not configured (missing LEADS_API_URL / LEADS_API_SECRET).' }, 503);
   }
 
-  // Build the Airtable record from a strict whitelist.
+  // Build the lead record from a strict whitelist.
   const lead = {
     Name: name,
     Phone: phone,
@@ -173,7 +173,9 @@ export async function onRequestPost({ request, env }) {
   }
   if (Array.isArray(raw.trades) && raw.trades.length) lead.Trades = raw.trades.slice(0, 24);
   if (Array.isArray(raw.counties) && raw.counties.length) lead['Service Area'] = raw.counties.slice(0, 8);
-  lead.Lang = raw.lang === 'es' ? 'ES' : 'EN';
+  // The lead store's column is "Language" (EN / ES / Both). Writing
+  // anything else would be dropped.
+  lead.Language = raw.lang === 'es' ? 'ES' : 'EN';
 
   try {
     const { leads, log } = tableIds(env);
@@ -213,13 +215,14 @@ export async function onRequestPost({ request, env }) {
       recId = created.id;
     }
 
-    // Attach documents. Airtable needs a public URL for attachments, so we
-    // upload to the attachment endpoint after creating the record.
+    // Attach documents. The local store writes the file to disk and
+    // appends it to the lead's attachment field, so we upload after
+    // the record exists.
     const attachField = { coi: 'COI Attachment', w9: 'W9 Attachment', photos: 'Photos' };
     for (const [k, f] of Object.entries(files)) {
       if (!f || !f.data || !attachField[k]) continue;
       try {
-        await uploadAttachment(env, leads, recId, attachField[k], f);
+        await uploadAttachment(env, token, recId, attachField[k], f);
       } catch (e) {
         await createRecord(env, log, {
           Type: 'Error',
@@ -231,7 +234,7 @@ export async function onRequestPost({ request, env }) {
     await createRecord(env, log, {
       Type: 'Lead',
       Lead: `${name}${lead.Company ? ' — ' + lead.Company : ''}`,
-      Detail: `Intake form submitted (${lead.Lang}). Trades: ${(lead.Trades || []).join(', ') || '—'}. Phone screen pending.`,
+      Detail: `Intake form submitted (${lead.Language}). Trades: ${(lead.Trades || []).join(', ') || '—'}. Phone screen pending.`,
     });
 
     const notify = await sendNotification(env, lead, files);
@@ -247,16 +250,21 @@ export async function onRequestPost({ request, env }) {
   }
 }
 
-async function uploadAttachment(env, table, recordId, fieldName, file) {
+async function uploadAttachment(env, token, recordId, fieldName, file) {
   const form = new FormData();
+  form.append('token', String(token || ''));
+  form.append('recordId', String(recordId || ''));
+  form.append('field', fieldName);
+  form.append('filename', file.name || 'upload');
   form.append('file', new File([Uint8Array.from(atob(file.data), (c) => c.charCodeAt(0))], file.name), file.name);
-  const res = await fetch(
-    `https://content.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${table}/${recordId}/${encodeURIComponent(fieldName)}/uploadAttachment`,
-    { method: 'POST', headers: { authorization: `Bearer ${env.AIRTABLE_PAT}` }, body: form },
-  );
+  const res = await fetch(`${storeBase(env)}/api/network/attachment`, {
+    method: 'POST',
+    headers: storeHeaders(env),
+    body: form,
+  });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Airtable upload ${res.status}: ${body.slice(0, 200)}`);
+    throw new Error(`Leads API POST attachment ${res.status}: ${body.slice(0, 200)}`);
   }
   return res.json();
 }

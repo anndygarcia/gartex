@@ -16,6 +16,7 @@ public marketing site is unaffected.
 | `/api/network/stats` | Auth-gated | Aggregations by trade/status/language |
 | `/api/network/log` | Auth-gated | Activity feed |
 | `/api/network/intake` | **Public** | Intake submission (writes a lead) |
+| `/api/network/file/<name>` | Auth-gated | Same-origin proxy for a stored attachment (COI / W9). Attaches the store secret server-side so the browser link needs no header |
 
 `/network/*` and `/apply` are excluded in `robots.txt` and carry
 `noindex`. The intake form is intentionally public and linkable — it is
@@ -28,9 +29,15 @@ Environment variables → Production**:
 
 | Variable | Type | Notes |
 |---|---|---|
-| `AIRTABLE_PAT` | Secret | Airtable personal access token. Needs `data.records:read`, `data.records:write`, `schema.bases:read`, `schema.bases:write` |
-| `AIRTABLE_BASE_ID` | Plain | The base holding the `Leads` and `Activity` tables |
+| `LEADS_API_URL` | Plain | Base URL of the local lead store, published through the Cloudflare Tunnel (`https://leads.gartex-construction.com`). The tunnel hostname is not a secret. |
+| `LEADS_API_SECRET` | Secret | Shared secret sent as the `X-Leads-Secret` header on every store request. This is the actual gate. |
 | `NETWORK_ADMIN_TOKEN` | Secret | The password for `/network/login`. The raw token is never stored in the cookie — only an HMAC of it |
+
+The lead store itself is a SQLite file on Anndy's Mac
+(`~/Gartex-Subcontractor-DB/leads.db`), served by `engine/local_api.py` on
+`127.0.0.1:8788` and published through the tunnel. It is **not** a hosted
+SaaS. The old Airtable path is retired; `AIRTABLE_PAT` and
+`AIRTABLE_BASE_ID` must not be set.
 
 Until `NETWORK_ADMIN_TOKEN` is set, `/network/login` returns
 `503 Server not configured`. That is the healthy "not wired yet" signal.
@@ -56,9 +63,11 @@ Applications) in front of `/network/*`. The Access API is not reachable
 with the project's API token, so that policy has to be created in the
 dashboard. Once it exists, drop the token gate.
 
-## Airtable schema
+## Lead store schema
 
-Base: **Gartex Subcontractor Network**
+The store is the SQLite file `~/Gartex-Subcontractor-DB/leads.db`. The
+site reads and writes it through the local API (`engine/local_api.py`),
+never directly.
 
 `Leads` table fields: `Name`, `Trades` (multi-select), `Status`, `Source`,
 `Language`, `Source Listing URL`, `Seller Profile URL`, `Specialty`,
@@ -77,15 +86,18 @@ with multiple trades.
 
 ```bash
 cd engine
-python3 local_test.mjs      # 51 checks against the real Pages Functions
+node local_test.mjs            # 66 checks against the real Pages Functions
 ```
 
 `local_test.mjs` runs the actual `functions/` handlers against a fake
-Airtable, so auth, validation, and the bilingual form are all exercised
-without touching production.
+local lead store (the same HTTP API `leadstore.js` calls in production),
+so auth, validation, and the bilingual form are all exercised without
+touching production or the real tunnel.
 
 ## Never commit secrets
 
-This repository is **public**. No token, PAT, or base id may ever be
-committed. Secrets live only in Cloudflare Pages environment variables and
-in the local `~/.hermes/.env` (mode 600).
+This repository is **public**. No token, secret, base id, or database
+file may ever be committed. Secrets live only in Cloudflare Pages
+environment variables and in the local `~/.hermes/.env` (mode 600). The
+SQLite lead store lives outside the repo at
+`~/Gartex-Subcontractor-DB/leads.db`.

@@ -2,23 +2,24 @@
 //   GET   → all lead records (flattened for the dashboard)
 //   PATCH → update fields on one record (e.g. drag a card to a new status)
 //
-// Auth required. Data source is Airtable.
+// Auth required. Data source is the local lead store (SQLite on Andy's
+// Mac, reached through the Cloudflare Tunnel).
 
 import { json, requireAuth } from '../../_lib/network-auth.js';
-import { listAll, updateRecord, isConfigured, tableIds } from '../../_lib/airtable.js';
+import { listAll, updateRecord, isConfigured, tableIds } from '../../_lib/leadstore.js';
 
 export async function onRequestGet({ request, env }) {
   const denial = await requireAuth(request, env);
   if (denial) return denial;
 
   if (!isConfigured(env)) {
-    return json({ error: 'Airtable not configured (missing AIRTABLE_PAT / AIRTABLE_BASE_ID).' }, 503);
+    return json({ error: 'Lead store not configured (missing LEADS_API_URL / LEADS_API_SECRET).' }, 503);
   }
 
   try {
     const { leads } = tableIds(env);
     const records = await listAll(env, leads, { maxRecords: 800 });
-    const { flatten } = await import('../../_lib/airtable.js');
+    const { flatten } = await import('../../_lib/leadstore.js');
     return json({ leads: records.map(flatten), count: records.length });
   } catch (e) {
     return json({ error: e.message }, 502);
@@ -30,7 +31,7 @@ export async function onRequestPatch({ request, env }) {
   if (denial) return denial;
 
   if (!isConfigured(env)) {
-    return json({ error: 'Airtable not configured (missing AIRTABLE_PAT / AIRTABLE_BASE_ID).' }, 503);
+    return json({ error: 'Lead store not configured (missing LEADS_API_URL / LEADS_API_SECRET).' }, 503);
   }
 
   let body;
@@ -61,7 +62,7 @@ export async function onRequestPatch({ request, env }) {
   try {
     const { leads } = tableIds(env);
     const updated = await updateRecord(env, leads, id, clean);
-    const { flatten } = await import('../../_lib/airtable.js');
+    const { flatten } = await import('../../_lib/leadstore.js');
     return json({ ok: true, lead: flatten(updated) });
   } catch (e) {
     return json({ error: e.message }, 502);

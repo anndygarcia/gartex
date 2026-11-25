@@ -1,18 +1,18 @@
 // /api/network/log  →  the activity feed (every bot action, newest first).
 //
-// Auth required. Sourced from the Airtable "Activity" table, which is the
-// audit trail for the campaign — it also serves as our evidence if Facebook
-// ever questions account activity.
+// Auth required. Sourced from the local lead store's "Activity" table,
+// which is the audit trail for the campaign — it also serves as our
+// evidence if Facebook ever questions account activity.
 
 import { json, requireAuth } from '../../_lib/network-auth.js';
-import { listAll, isConfigured, tableIds } from '../../_lib/airtable.js';
+import { listAll, isConfigured, tableIds } from '../../_lib/leadstore.js';
 
 export async function onRequestGet({ request, env }) {
   const denial = await requireAuth(request, env);
   if (denial) return denial;
 
   if (!isConfigured(env)) {
-    return json({ error: 'Airtable not configured (missing AIRTABLE_PAT / AIRTABLE_BASE_ID).' }, 503);
+    return json({ error: 'Lead store not configured (missing LEADS_API_URL / LEADS_API_SECRET).' }, 503);
   }
 
   try {

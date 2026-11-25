@@ -4,8 +4,9 @@
 // served as a static file, so the shell itself is never reachable without
 // passing the auth gate below.
 //
-// Airtable is the source of truth. If it isn't configured yet, the page
-// still renders (so Anndy can see the tool exists) but the API calls
+// The lead store is a SQLite file on Anndy's Mac behind a Cloudflare
+// Tunnel. If LEADS_API_URL / LEADS_API_SECRET aren't configured yet, the
+// page still renders (so Anndy can see the tool exists) but the API calls
 // return 503 with a clear message instead of pretending there is no data.
 
 import { requireAuthPage } from '../_lib/network-auth.js';

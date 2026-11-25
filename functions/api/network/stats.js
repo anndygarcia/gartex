@@ -1,10 +1,11 @@
 // /api/network/stats  →  funnel + trade-coverage aggregates for the dashboard.
 //
 // Auth required. All aggregation happens here (server-side) so the client
-// just renders numbers — and so the Airtable token never reaches the browser.
+// just renders numbers — and so the lead-store secret never reaches the
+// browser.
 
 import { json, requireAuth } from '../../_lib/network-auth.js';
-import { listAll, isConfigured, tableIds } from '../../_lib/airtable.js';
+import { listAll, isConfigured, tableIds } from '../../_lib/leadstore.js';
 
 const STAGES = [
   'Listed', 'Messaged', 'Replied', 'Form submitted',
@@ -20,8 +21,8 @@ const ALL_TRADES = [
   'Garage Doors', 'Low Voltage', 'Solar',
 ];
 
-// Airtable records are { id, createdTime, fields }. Trades live under
-// .fields — reading lead.Trades directly silently yields nothing.
+// Records are { id, createdTime, fields }. Trades live under .fields —
+// reading lead.Trades directly silently yields nothing.
 function tradesOf(rec) {
   const t = rec?.fields?.Trades;
   if (!t) return [];
@@ -41,7 +42,7 @@ export async function onRequestGet({ request, env }) {
   if (denial) return denial;
 
   if (!isConfigured(env)) {
-    return json({ error: 'Airtable not configured (missing AIRTABLE_PAT / AIRTABLE_BASE_ID).' }, 503);
+    return json({ error: 'Lead store not configured (missing LEADS_API_URL / LEADS_API_SECRET).' }, 503);
   }
 
   try {
