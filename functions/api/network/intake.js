@@ -133,11 +133,20 @@ export async function onRequestPost({ request, env }) {
   const phone = String(raw['Phone'] || '').trim();
   const email = String(raw['Email'] || '').trim();
   if (name.length < 2) return json({ error: 'Please enter your name.' }, 400);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ error: 'Please enter a valid email.' }, 400);
   if (phone.replace(/\D/g, '').length < 10) return json({ error: 'Please enter a valid phone number.' }, 400);
+  // Email is OPTIONAL. A trade contractor reached on Marketplace often
+  // has no email set up, and making it required pushes the good ones
+  // out of the form. If one is given it must be valid.
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    return json({ error: 'Please enter a valid email.' }, 400);
+  }
   if (String(raw['Specialty'] || '').trim().length < 5) {
     return json({ error: 'Please describe your specialty.' }, 400);
   }
+  // At least one trade — without it we cannot route the lead or pick a
+  // message template.
+  const tradeList = Array.isArray(raw.trades) ? raw.trades.filter(Boolean) : [];
+  if (!tradeList.length) return json({ error: 'Please pick at least one trade.' }, 400);
 
   // Validate uploads: count + size caps.
   const fileKeys = Object.keys(files);
