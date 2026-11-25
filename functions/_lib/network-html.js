@@ -113,6 +113,8 @@ export function dashboardHtml() {
   .dl{display:grid;grid-template-columns:150px 1fr;gap:7px 12px;font-size:13px}
   .dl dt{color:var(--muted);font-weight:600}
   .dl dd{word-break:break-word}
+  .dl dd a{color:#8ab6f5;text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+  .dl dd a:hover{color:#b9d2fb}
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#22304a;border:1px solid var(--line);padding:11px 18px;border-radius:9px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:80}
   .toast.show{opacity:1}
   select,input,textarea{background:#111a2b;border:1px solid var(--line);color:var(--text);border-radius:7px;padding:8px 10px;font-size:13px;font-family:inherit}
@@ -180,7 +182,7 @@ export function dashboardHtml() {
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/network/dashboard.js?v=net1"></script>
+<script src="/network/dashboard.js?v=net2"></script>
 </body>
 </html>`;
 }

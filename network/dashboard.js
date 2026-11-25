@@ -30,9 +30,42 @@ const el = (t, cls, html) => {
   if (html !== undefined) n.innerHTML = html;
   return n;
 };
+// ── pure helpers (kept in one block so the node suite can eval it) ──
 const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Render a field's VALUE as a usable control instead of dead text.
+//
+// The whole job of this drawer is "look at the lead, then go vet them",
+// and vetting means opening the Facebook listing. A bare URL forces
+// Anndy to select it and copy it by hand, on every lead, forever.
+//
+// Safety: the lead store holds text scraped from listings, so a value
+// can contain anything. Only http/https becomes an anchor — a
+// "javascript:" URL must never reach an href — and the href is escaped
+// like any other text.
+const URL_FIELDS = new Set(['Source Listing URL', 'Seller Profile URL']);
+const isHttpUrl = (v) => /^https?:\/\//i.test(String(v || '').trim());
+
+function fieldValue(key, value) {
+  const raw = Array.isArray(value) ? value.join(', ') : value;
+  const text = esc(raw);
+  if (!text) return '';
+
+  if (URL_FIELDS.has(key) && isHttpUrl(raw)) {
+    return `<a href="${text}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+  }
+  if (key === 'Phone' && /^[\d+()\s.-]{7,}$/.test(String(raw).trim())) {
+    const tel = String(raw).replace(/[^\d+]/g, '');
+    return `<a href="tel:${esc(tel)}">${text}</a>`;
+  }
+  if (key === 'Email' && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(raw).trim())) {
+    return `<a href="mailto:${text}">${text}</a>`;
+  }
+  return text;
+}
+// ── end pure helpers ──
 
 function toast(msg) {
   const t = $('#toast');
@@ -186,7 +219,7 @@ async function openDrawer(id) {
   $('#dTitle').textContent = lead.Name || 'Lead';
   const rows = Object.entries(lead)
     .filter(([k]) => !k.startsWith('__') && k !== 'Notes')
-    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(Array.isArray(v) ? v.join(', ') : v)}</dd>`)
+    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${fieldValue(k, v)}</dd>`)
     .join('');
   const opts = STATUSES.map((s) => `<option ${s === lead.Status ? 'selected' : ''}>${esc(s)}</option>`).join('');
   $('#dBody').innerHTML =
