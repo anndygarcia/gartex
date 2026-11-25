@@ -498,13 +498,53 @@
             <input type="email" id="email" name="email" required autocomplete="email">
           </div>
           <div class="form-field">
+            <label for="service">What do you need built?</label>
+            <select id="service" name="service">
+              <option value="">Select a service…</option>
+              <option>Custom Home Framing</option>
+              <option>Custom Cornice</option>
+              <option>Remodeling</option>
+              <option>Custom ADU</option>
+              <option>Tiny Home</option>
+              <option>Granny Flat</option>
+              <option>She Shed</option>
+              <option>Man Cave</option>
+              <option>Custom Sauna</option>
+              <option>Custom Patio</option>
+              <option>Custom Pergola</option>
+              <option>Room Add-on</option>
+              <option>Custom Landscaping</option>
+              <option>Custom Fencing</option>
+              <option>Demolition</option>
+              <option>Paint &amp; Sheetrock</option>
+              <option>Electrical</option>
+              <option>Solar</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="budget">Budget range <span class="opt">(optional)</span></label>
+            <input type="text" id="budget" name="budget" placeholder="e.g. $50-100k, or &quot;need a quote&quot;">
+          </div>
+          <div class="form-field">
             <label for="location">Project location</label>
             <input type="text" id="location" name="location" placeholder="City or neighborhood (e.g. Katy, River Oaks)">
+          </div>
+          <div class="form-field">
+            <label for="zip">ZIP code <span class="opt">(optional)</span></label>
+            <input type="text" id="zip" name="zip" inputmode="numeric" maxlength="10" placeholder="e.g. 77005">
           </div>
           <div class="form-field">
             <label for="project">Tell us about your project</label>
             <textarea id="project" name="project" rows="5" placeholder="Custom home build, addition, framing only, cornice work..."></textarea>
           </div>
+          <!-- Attribution: which page/listing produced this inquiry.
+               Populated from the URL query string by the script below so a
+               Marketplace listing can be traced back to the lead. -->
+          <input type="hidden" id="listing_id" name="listing_id" value="">
+          <input type="hidden" id="listing_url" name="listing_url" value="">
+          <input type="hidden" id="listing_title" name="listing_title" value="">
+          <input type="hidden" id="listing_source" name="listing_source" value="">
           <button type="submit" class="btn btn-primary btn-full" id="contactSubmit">Send Message</button>
           <p class="form-note" id="formStatus">We respond within one business day. No spam, ever.</p>
         </form>
@@ -649,6 +689,38 @@
     const form = document.getElementById('contactForm');
     const formStatus = document.getElementById('formStatus');
     const submitBtn = document.getElementById('contactSubmit');
+
+    // ── Attribution ──────────────────────────────────────────────────
+    // Read ?service=&listing=&listing_title=&listing_source=&zip= from the URL
+    // so a lead can be traced back to the Marketplace listing that produced
+    // it. Pre-fills the service dropdown when the page knows the service.
+    (() => {
+      const q = new URLSearchParams(location.search);
+      const setVal = (id, v) => {
+        const el = document.getElementById(id);
+        if (el && v) el.value = v;
+      };
+      const svc = q.get('service');
+      if (svc) {
+        const sel = document.getElementById('service');
+        if (sel) {
+          const wanted = svc.toLowerCase();
+          const opt = Array.from(sel.options).find(o => o.value.toLowerCase() === wanted);
+          if (opt) sel.value = opt.value;
+          else {
+            const o = document.createElement('option');
+            o.value = svc; o.textContent = svc;
+            sel.appendChild(o); sel.value = svc;
+          }
+        }
+      }
+      setVal('listing_id', q.get('listing_id') || q.get('listing'));
+      setVal('listing_url', q.get('listing_url'));
+      setVal('listing_title', q.get('listing_title'));
+      setVal('listing_source', q.get('listing_source') || q.get('source'));
+      setVal('zip', q.get('zip'));
+    })();
+
     form?.addEventListener('submit', async e => {
       e.preventDefault();
       formStatus.classList.remove('is-success', 'is-error');

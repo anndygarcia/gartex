@@ -27,6 +27,9 @@
 const TABLES = {
   leads: 'Leads',
   log: 'Activity',
+  // Demand side — homeowner inquiries (the opposite end of the deal from a
+  // subcontractor lead). Stored in the same local database, different table.
+  demand: 'DemandLeads',
 };
 
 export function json(obj, status = 200, headers = {}) {
@@ -44,6 +47,7 @@ export function tableIds(env) {
   return {
     leads: TABLES.leads,
     log: TABLES.log,
+    demand: TABLES.demand,
   };
 }
 
@@ -81,7 +85,13 @@ function wireTable(table) {
   const key = String(table || '').trim().toLowerCase();
   if (key === 'leads') return TABLES.leads;
   if (key === 'activity') return TABLES.log;
-  throw new Error(`unknown table "${table}" (expected Leads or Activity)`);
+  if (key === 'demand' || key === 'demand_leads') return TABLES.demand;
+  throw new Error(`unknown table "${table}" (expected Leads, Activity or DemandLeads)`);
+}
+
+/** True when `table` is the homeowner-side demand table. */
+export function isDemandTable(table) {
+  return wireTable(table) === TABLES.demand;
 }
 
 /** List all records of a table. */

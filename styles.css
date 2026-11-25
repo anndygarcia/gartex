@@ -1043,6 +1043,51 @@ html, body {
   letter-spacing: 0.02em;
 }
 
+/* "(optional)" marker next to a label — de-emphasised so it doesn't
+   compete with the field's own label. */
+.form-field label .opt {
+  font-weight: 500;
+  color: #7a8aa3;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Service <select> — matches the text inputs exactly, with a chevron. */
+.form-field select {
+  font-family: inherit;
+  font-size: 16px;          /* 16px+ prevents iOS Safari from auto-zooming on focus */
+  padding: 12px 14px;
+  border: 1px solid #dce7f5;
+  border-radius: var(--radius);
+  background: #fafcff;
+  color: var(--color-text);
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%231e90ff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.form-field select:hover:not(:focus) {
+  border-color: #b9d0ec;
+}
+
+.form-field select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.12);
+}
+
+.form-field select:invalid,
+.form-field select option[value=""] {
+  color: #7a8aa3;
+}
+
 .form-field input,
 .form-field textarea {
   font-family: inherit;

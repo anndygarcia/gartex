@@ -1,8 +1,138 @@
 // Cloudflare Pages Function: receives contact-form submissions from
 // gartex-construction.com, emails the lead to Gartex, and emails a
 // branded confirmation back to the visitor.
+//
+// It ALSO persists the inquiry to the local lead database (demand_leads
+// table) via the Cloudflare Tunnel, so a homeowner inquiry becomes a real
+// pipeline record with service/trade/listing attribution — not just an
+// email that has to be manually retyped somewhere.
+//
+// Ordering: persist first, email second. The database record is the source
+// of truth; the email is the fast notification. If persistence fails the
+// email still goes out (fail-safe) — the lead is never lost, and the
+// failure is logged for the operator.
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// Service label -> trade. Kept in sync with
+// workspace/gartex/homeowner-demand/engine/demand_leads.py SERVICE_TO_TRADE.
+// A homeowner says "I want an ADU"; the sub pool that can build it is
+// called "Framing". This maps marketing language -> trade vocabulary.
+const SERVICE_TO_TRADE = {
+  'custom home framing': 'Framing',
+  'home framing': 'Framing',
+  framing: 'Framing',
+  'custom cornice': 'Cornice & Trim',
+  cornice: 'Cornice & Trim',
+  'architectural trim': 'Cornice & Trim',
+  'crown molding': 'Cornice & Trim',
+  remodeling: 'Carpentry',
+  remodel: 'Carpentry',
+  renovation: 'Carpentry',
+  'custom adu': 'Framing',
+  adu: 'Framing',
+  'granny flat': 'Framing',
+  casita: 'Framing',
+  'tiny home': 'Framing',
+  'she shed': 'Carpentry',
+  'man cave': 'Carpentry',
+  sauna: 'Carpentry',
+  'custom patio': 'Landscaping',
+  patio: 'Landscaping',
+  landscaping: 'Landscaping',
+  'custom landscaping': 'Landscaping',
+  'add-on': 'Framing',
+  addition: 'Framing',
+  'room addition': 'Framing',
+  paint: 'Drywall & Paint',
+  sheetrock: 'Drywall & Paint',
+  drywall: 'Drywall & Paint',
+  electrical: 'Electrical',
+  solar: 'Solar',
+  demolition: 'Demolition',
+  demo: 'Demolition',
+  fencing: 'Fencing',
+  fence: 'Fencing',
+  concrete: 'Concrete',
+  flatwork: 'Concrete',
+  plumbing: 'Plumbing',
+  roofing: 'Roofing',
+  siding: 'Siding',
+  decks: 'Carpentry',
+  porches: 'Carpentry',
+  pergola: 'Carpentry',
+  'garage conversion': 'Framing',
+  'pool house': 'Framing',
+  'home office': 'Carpentry',
+  'guest house': 'Framing',
+  hvac: 'HVAC',
+  'air conditioning': 'HVAC',
+  ac: 'HVAC',
+};
+
+/** Best-effort trade for a service label, falling back to the project text. */
+function inferTrade(service, project) {
+  const s = String(service || '').trim().toLowerCase();
+  if (!s) return '';
+  if (SERVICE_TO_TRADE[s]) return SERVICE_TO_TRADE[s];
+  for (const [key, trade] of Object.entries(SERVICE_TO_TRADE)) {
+    if (key && s.includes(key)) return trade;
+  }
+  const blob = `${s} ${String(project || '')}`.toLowerCase();
+  for (const [key, trade] of Object.entries(SERVICE_TO_TRADE)) {
+    if (key && blob.includes(key)) return trade;
+  }
+  return '';
+}
+
+/** Extract a numeric budget from free text like '$80-120k'. */
+function parseBudget(text) {
+  const s = String(text || '').trim().toLowerCase().replace(/,/g, '');
+  if (!s) return null;
+  let m = s.match(/\$\s*([0-9][0-9.]*)\s*([km])?/);
+  if (!m) m = s.match(/\b([0-9][0-9,.]*)\s*([km])\b/);
+  if (!m) m = s.match(/\b([0-9]{4,})\b/);
+  if (!m) return null;
+  let val = parseFloat(m[1]);
+  if (!Number.isFinite(val)) return null;
+  const unit = (m[2] || '').toLowerCase();
+  if (unit === 'k') val *= 1000;
+  else if (unit === 'm') val *= 1000000;
+  return val;
+}
+
+/**
+ * Persist the inquiry to the local lead database through the tunnel.
+ *
+ * Never throws: a storage outage must not lose the lead, because the email
+ * notification is still going to go out. Returns {id} or {error}.
+ */
+async function persistDemandLead(env, fields) {
+  const base = String(env.LEADS_API_URL || '').replace(/\/+$/, '');
+  const secret = env.LEADS_API_SECRET;
+  if (!base || !secret) {
+    return { error: 'LEADS_API_URL / LEADS_API_SECRET not configured' };
+  }
+  try {
+    const res = await fetch(`${base}/api/network/records`, {
+      method: 'POST',
+      headers: {
+        'X-Leads-Secret': secret,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ table: 'DemandLeads', fields }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      const safe = secret ? body.split(secret).join('[redacted]') : body;
+      return { error: `store responded ${res.status}: ${String(safe).slice(0, 200)}` };
+    }
+    const rec = await res.json();
+    return { id: rec && rec.id };
+  } catch (e) {
+    return { error: `store network error: ${e.message}` };
+  }
+}
 
 function json(o, s = 200) {
   return new Response(JSON.stringify(o), {
@@ -47,6 +177,16 @@ export async function onRequestPost({ request, env }) {
     const project = String(body.project || '').trim();
     const phone = String(body.phone || '').trim();
     const location = String(body.location || '').trim();
+    // Attribution — which listing produced this inquiry, and what they want.
+    const service = String(body.service || '').trim();
+    const budget = String(body.budget || '').trim();
+    const zip = String(body.zip || '').trim();
+    const timeline = String(body.timeline || '').trim();
+    const listingId = String(body.listing_id || body.listingId || '').trim();
+    const listingUrl = String(body.listing_url || body.listingUrl || '').trim();
+    const listingTitle = String(body.listing_title || body.listingTitle || '').trim();
+    const listingSource = String(body.listing_source || body.listingSource || '').trim();
+    const language = String(body.language || 'en').trim();
 
     if (name.length < 2) return json({ error: 'Please enter your name.' }, 400);
     if (!EMAIL_RE.test(email)) return json({ error: 'Please enter a valid email.' }, 400);
@@ -54,6 +194,34 @@ export async function onRequestPost({ request, env }) {
 
     // Pre-compute pieces both emails share so they're consistent.
     const firstName = name.split(/\s+/)[0] || name;
+
+    // ─── 0. Persist to the lead database (source of truth) ────────────
+    // Done BEFORE the email so a mail outage can't lose the record. A
+    // persistence failure is logged and the email still goes out.
+    const trade = inferTrade(service, project);
+    const demandResult = await persistDemandLead(env, {
+      Name: name,
+      Phone: phone,
+      Email: email,
+      Service: service,
+      Trade: trade,
+      Project: project,
+      Budget: budget,
+      'Budget Number': parseBudget(budget),
+      Location: location,
+      ZIP: zip,
+      Timeline: timeline,
+      Language: language,
+      Source: listingSource || (listingId ? 'Marketplace' : 'Site'),
+      'Source Listing ID': listingId,
+      'Source Listing URL': listingUrl,
+      'Source Listing Title': listingTitle,
+      Status: 'New',
+      'Next Action': 'Reply within 24h',
+    });
+    if (demandResult.error) {
+      console.warn(`Demand lead persistence failed (email will still be sent): ${demandResult.error}`);
+    }
 
     // ─── 1. Send the lead notification to Gartex ─────────────────────
     const leadText = [
@@ -63,6 +231,10 @@ export async function onRequestPost({ request, env }) {
       `Phone: ${phone || '-'}`,
       `Email: ${email}`,
       `Project location: ${location || '-'}`,
+      ...(service ? [`Service wanted: ${service}${trade ? ` (trade: ${trade})` : ''}`] : []),
+      ...(budget ? [`Budget: ${budget}`] : []),
+      ...(listingTitle ? [`From listing: ${listingTitle}`] : []),
+      ...(listingUrl ? [`Listing: ${listingUrl}`] : []),
       '',
       'Project details:',
       project,
@@ -303,6 +475,8 @@ export async function onRequestPost({ request, env }) {
     return json({
       ok: true,
       lead_id: leadResult.id,
+      demand_id: demandResult.id || null,
+      persisted: !demandResult.error,
       confirm_id: confirmId,
     }, 200);
   } catch (e) {
