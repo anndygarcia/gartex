@@ -98,6 +98,12 @@ export async function onRequestGet({ request, env }) {
         awaiting: records.filter((r) => r.fields?.Status === 'Messaged').length,
         inPipeline: records.filter((r) => PIPELINE.has(r.fields?.Status || 'Listed')).length,
         replyRate: messaged ? Math.round((replied / messaged) * 100) : 0,
+        // Two different questions, two different numbers:
+        //   tradesWithLeads  — which trades do we have ANYONE for?
+        //   tradesCovered    — which trades do we have someone VETTED for?
+        // Counting only the second made the dashboard read 0/24 while
+        // seven trades were live in the pipeline.
+        tradesWithLeads: tradeRows.filter((t) => t.total > 0).length,
         tradesCovered: tradeRows.filter((t) => t.approved > 0).length,
         tradesTotal: ALL_TRADES.length,
         coiExpiring,

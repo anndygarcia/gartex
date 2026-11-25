@@ -99,6 +99,12 @@ export function dashboardHtml() {
   .two{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;align-items:start}
   .coverage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:11px}
   .cov{background:#111a2b;border:1px solid var(--line);border-radius:9px;padding:12px}
+  .covhead{font-size:12.5px;color:var(--muted);margin:2px 0 11px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+  .covhead strong{color:var(--text);font-size:14px}
+  .coval.gaps{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .gaphead{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  .gaplist{display:flex;flex-wrap:wrap;gap:6px}
+  .gap{font-size:11.5px;color:var(--muted);background:#0d1626;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
   .cov .t{font-size:13.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
   .cov .b{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
   .bar{height:6px;border-radius:4px;background:#22304a;margin-top:9px;overflow:hidden}
@@ -182,7 +188,7 @@ export function dashboardHtml() {
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/network/dashboard.js?v=net2"></script>
+<script src="/network/dashboard.js?v=net3"></script>
 </body>
 </html>`;
 }

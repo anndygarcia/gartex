@@ -113,7 +113,7 @@ function renderKpis(stats) {
     { label: 'Approved', value: stats.approved, sub: 'vetted and usable' },
     { label: 'Available now', value: stats.available, sub: 'can start work' },
     { label: 'Awaiting reply', value: stats.awaiting, sub: 'messaged, no response' },
-    { label: 'Trades covered', value: stats.tradesCovered + '/' + stats.tradesTotal, sub: 'trades with ≥1 approved' },
+    { label: 'Trades covered', value: (stats.tradesWithLeads ?? stats.tradesCovered) + '/' + stats.tradesTotal, sub: (stats.tradesWithLeads ?? 0) + ' with leads · ' + (stats.tradesCovered || 0) + ' vetted' },
     { label: 'Reply rate', value: stats.replyRate + '%', sub: 'of messages sent' },
     { label: 'COI expiring', value: stats.coiExpiring, sub: 'within 30 days' },
   ];
@@ -171,13 +171,27 @@ function renderCoverage(stats) {
     box.appendChild(el('div', 'empty', 'No trades yet.'));
     return;
   }
-  for (const t of trades) {
+  // Trades with leads are the live coverage; the rest are gaps we still
+  // need to source, so they are listed separately instead of padding
+  // the board with rows that only ever read 0.
+  const live = trades.filter((t) => t.total > 0);
+  const gaps = trades.filter((t) => t.total === 0);
+  const head = el('div', 'covhead', '');
+  head.innerHTML = `<strong>${live.length}</strong> trade(s) with leads · <strong>${gaps.length}</strong> still to source`;
+  box.appendChild(head);
+  for (const t of live) {
     const lvl = t.approved >= 2 ? '' : (t.approved === 1 ? 'mid' : 'low');
     const pct = Math.min(100, (t.approved / 4) * 100);
     box.appendChild(el('div', 'cov',
       `<div class="t"><span>${esc(t.trade)}</span><span class="pill ${t.approved >= 2 ? 'ok' : (t.approved ? 'warn' : 'bad')}">${t.approved}</span></div>` +
       `<div class="b">${t.approved} approved · ${t.available} available now · ${t.total} leads</div>` +
       `<div class="bar"><i class="${lvl}" style="width:${pct}%"></i></div>`));
+  }
+  if (gaps.length) {
+    const g = el('div', 'coval gaps', '');
+    g.innerHTML = '<div class="gaphead">Still to source</div>' +
+      '<div class="gaplist">' + gaps.map((t) => `<span class="gap">${esc(t.trade)}</span>`).join('') + '</div>';
+    box.appendChild(g);
   }
 }
 
