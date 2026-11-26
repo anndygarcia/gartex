@@ -518,6 +518,14 @@
           </div>
           <button type="submit" class="btn btn-primary btn-full" id="contactSubmit">Send Message</button>
           <p class="form-note" id="formStatus">We respond within one business day. No spam, ever.</p>
+          <input type="hidden" id="listing_id" name="listing_id" value="">
+          <input type="hidden" id="listing_url" name="listing_url" value="">
+          <input type="hidden" id="listing_title" name="listing_title" value="">
+          <input type="hidden" id="listing_source" name="listing_source" value="">
+          <input type="hidden" id="service" name="service" value="Custom Home Builds">
+          <input type="hidden" id="budget" name="budget" value="">
+          <input type="hidden" id="zip" name="zip" value="">
+
         </form>
         <div class="map-card">
           <iframe src="https://www.google.com/maps?q=Houston%2C%20TX&amp;z=10&amp;output=embed"
@@ -698,6 +706,26 @@
       }, { threshold: 0.12 });
       els.forEach(el => io.observe(el));
     })();
-  </script>
+  
+    // ── Listing attribution ────────────────────────────────────────────
+    // A Marketplace visitor may arrive with ?listing_id=&listing_url=&listing_title=
+    // &listing_source=&service=&zip=. Capture them so the inquiry is
+    // attributable and lands in the right trade pool.
+    (() => {
+      const q = new URLSearchParams(location.search);
+      const setVal = (id, v) => {
+        const el = document.getElementById(id);
+        if (el && v !== null && v !== undefined && v !== '') el.value = v;
+      };
+      setVal('listing_id',   q.get('listing_id')   || q.get('listing'));
+      setVal('listing_url',  q.get('listing_url'));
+      setVal('listing_title',q.get('listing_title'));
+      setVal('listing_source',q.get('listing_source') || q.get('source'));
+      setVal('zip',          q.get('zip'));
+      setVal('budget',       q.get('budget'));
+      const svc = q.get('service');
+      if (svc) setVal('service', svc);
+    })();
+</script>
 </body>
 </html>

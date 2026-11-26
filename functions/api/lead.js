@@ -89,16 +89,36 @@ function inferTrade(service, project) {
 function parseBudget(text) {
   const s = String(text || '').trim().toLowerCase().replace(/,/g, '');
   if (!s) return null;
+
+  const scale = (n, unit) => {
+    let v = parseFloat(n);
+    if (!Number.isFinite(v)) return null;
+    const u = (unit || '').toLowerCase();
+    if (u === 'k') v *= 1000;
+    else if (u === 'm') v *= 1000000;
+    return v;
+  };
+
+  // Range:  <num>[k/m]? ( - | to | ~ ) <num>[k/m]?
+  const range = s.match(/([0-9][0-9.]*)\s*([km])?\s*(?:-|–|—|to)\s*\$?\s*([0-9][0-9.]*)\s*([km])?/);
+  if (range) {
+    let unit = range[2] || range[4] || '';
+    const lo = scale(range[1], unit);
+    const hi = scale(range[3], unit);
+    if (lo !== null && hi !== null) {
+      const a = Math.min(lo, hi), b = Math.max(lo, hi);
+      return (a + b) / 2;
+    }
+  }
+
+  // Single amount with an optional currency symbol
   let m = s.match(/\$\s*([0-9][0-9.]*)\s*([km])?/);
-  if (!m) m = s.match(/\b([0-9][0-9,.]*)\s*([km])\b/);
-  if (!m) m = s.match(/\b([0-9]{4,})\b/);
-  if (!m) return null;
-  let val = parseFloat(m[1]);
-  if (!Number.isFinite(val)) return null;
-  const unit = (m[2] || '').toLowerCase();
-  if (unit === 'k') val *= 1000;
-  else if (unit === 'm') val *= 1000000;
-  return val;
+  if (m) return scale(m[1], m[2]);
+  m = s.match(/\b([0-9][0-9.]*)\s*([km])\b/);
+  if (m) return scale(m[1], m[2]);
+  m = s.match(/\b([0-9]{4,})\b/);
+  if (m) return scale(m[1], '');
+  return null;
 }
 
 /**
