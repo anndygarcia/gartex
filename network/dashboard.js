@@ -35,6 +35,53 @@ const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// COI expiry: how many days are left on a lead's insurance?
+//
+// A COI that lapses in three weeks is a subcontractor who cannot legally
+// work on Gartex's job in a month. That has to be VISIBLE on the board,
+// not buried in a drawer field -- the whole point of the expiry track is
+// that Anndy acts on it before it lapses.
+//
+// Returns null when there is no usable date, so a blank field never
+// pretends to be a valid date. Returns a negative number for an
+// already-expired policy, which is the worst case and must read as red.
+const COI_WARN_DAYS = 30;
+const COI_SOON_DAYS = 60;
+
+function coiDaysLeft(expiry, now) {
+  if (!expiry) return null;
+  const raw = String(expiry).trim();
+  if (!raw) return null;
+  const t = new Date(raw).getTime();
+  if (!Number.isFinite(t)) return null;
+  const base = now == null ? Date.now() : Number(now);
+  return Math.ceil((t - base) / 86400000);
+}
+
+// Severity for a COI expiry date.
+//   'expired' — already lapsed
+//   'bad'     — lapses within 30 days
+//   'warn'    — lapses within 60 days
+//   'ok'      — comfortable
+//   null      — no usable date
+function coiSeverity(expiry, now) {
+  const days = coiDaysLeft(expiry, now);
+  if (days === null) return null;
+  if (days < 0) return 'expired';
+  if (days <= COI_WARN_DAYS) return 'bad';
+  if (days <= COI_SOON_DAYS) return 'warn';
+  return 'ok';
+}
+
+// A short human label for the expiry, e.g. "12 days left".
+function coiExpiryLabel(expiry, now) {
+  const days = coiDaysLeft(expiry, now);
+  if (days === null) return '';
+  if (days < 0) return `expired ${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'} ago`;
+  if (days === 0) return 'expires today';
+  return `${days} day${days === 1 ? '' : 's'} left`;
+}
+
 // Render a field's VALUE as a usable control instead of dead text.
 //
 // The whole job of this drawer is "look at the lead, then go vet them",
@@ -62,6 +109,17 @@ function fieldValue(key, value) {
   }
   if (key === 'Email' && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(raw).trim())) {
     return `<a href="mailto:${text}">${text}</a>`;
+  }
+  // The COI expiry date flags itself: red when it has lapsed or lapses
+  // inside 30 days, amber inside 60, plain text otherwise.
+  if (key === 'COI Expiry') {
+    const sev = coiSeverity(raw);
+    if (sev === 'expired' || sev === 'bad') {
+      return `<span class="pill bad">${text} · ${esc(coiExpiryLabel(raw))}</span>`;
+    }
+    if (sev === 'warn') {
+      return `<span class="pill warn">${text} · ${esc(coiExpiryLabel(raw))}</span>`;
+    }
   }
   return text;
 }
@@ -115,10 +173,13 @@ function renderKpis(stats) {
     { label: 'Awaiting reply', value: stats.awaiting, sub: 'messaged, no response' },
     { label: 'Trades covered', value: (stats.tradesWithLeads ?? stats.tradesCovered) + '/' + stats.tradesTotal, sub: (stats.tradesWithLeads ?? 0) + ' with leads · ' + (stats.tradesCovered || 0) + ' vetted' },
     { label: 'Reply rate', value: stats.replyRate + '%', sub: 'of messages sent' },
-    { label: 'COI expiring', value: stats.coiExpiring, sub: 'within 30 days' },
+    { label: 'COI expiring', value: stats.coiExpiring, sub: 'within 30 days', alert: (stats.coiExpiring || 0) > 0 },
   ];
   for (const k of kpis) {
-    box.appendChild(el('div', 'kpi',
+    // A non-zero "COI expiring" is the one KPI that must shout. A count
+    // of 3 in plain grey reads the same as a count of 0 to someone
+    // scanning the row, and the whole point is to make it unmissable.
+    box.appendChild(el('div', 'kpi' + (k.alert ? ' kpi-alert' : ''),
       `<div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub">${esc(k.sub)}</div>`));
   }
 }
@@ -128,11 +189,21 @@ function leadCard(lead) {
   const c = el('div', 'card');
   c.draggable = true;
   c.dataset.id = lead.__id;
+  // An expiring or lapsed COI has to be visible on the board itself.
+  // The KPI count says "3 expiring" but not WHICH sub -- and the one
+  // that needs chasing today is the one whose card is in front of you.
+  const sev = coiSeverity(lead['COI Expiry']);
+  const badge = (sev === 'expired' || sev === 'bad')
+    ? `<span class="pill bad coi-flag">COI ${esc(coiExpiryLabel(lead['COI Expiry']))}</span>`
+    : (sev === 'warn'
+      ? `<span class="pill warn coi-flag">COI ${esc(coiExpiryLabel(lead['COI Expiry']))}</span>`
+      : '');
   c.innerHTML =
     `<div class="name">${esc(lead.Name || 'Unnamed')}</div>` +
     `<div class="meta">${esc(lead.Company || '')}${lead.Company ? ' · ' : ''}${esc(lead.Capacity || '')}</div>` +
     trades.map((t) => `<span class="tag">${esc(t)}</span>`).join('') +
-    (lead.Language ? `<span class="tag">${esc(lead.Language)}</span>` : '');
+    (lead.Language ? `<span class="tag">${esc(lead.Language)}</span>` : '') +
+    badge;
   c.addEventListener('click', () => openDrawer(lead.__id));
   c.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', lead.__id);

@@ -70,6 +70,12 @@ export function dashboardHtml() {
   .kpi .label{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
   .kpi .value{font-size:30px;font-weight:800;margin-top:7px;letter-spacing:-.5px}
   .kpi .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  /* An expiring COI is the one KPI that must be impossible to miss. */
+  .kpi-alert{background:rgba(255,107,107,.13);border-color:var(--bad);
+    box-shadow:0 0 0 1px rgba(255,107,107,.35),0 6px 20px rgba(255,107,107,.14)}
+  .kpi-alert .label{color:var(--bad)}
+  .kpi-alert .value{color:var(--bad)}
+  .kpi-alert .sub{color:#ffb3b3}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px 18px}
   .panel h2{font-size:15px;font-weight:700;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
   .panel h2 .hint{font-size:12px;color:var(--muted);font-weight:500}
@@ -81,6 +87,8 @@ export function dashboardHtml() {
   .card .name{font-size:13.5px;font-weight:700}
   .card .meta{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45}
   .card .tag{display:inline-block;background:#27364f;color:#cfe0f5;font-size:10.5px;padding:2px 7px;border-radius:20px;margin:5px 4px 0 0}
+  /* The COI expiry flag on the card itself. */
+  .card .coi-flag{margin:5px 4px 0 0;font-size:10.5px;font-weight:700}
   .card.drag{opacity:.45}
   .col.over{outline:2px dashed var(--accent);outline-offset:2px}
   table{width:100%;border-collapse:collapse;font-size:13px}
