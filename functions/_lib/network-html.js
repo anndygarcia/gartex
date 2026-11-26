@@ -196,7 +196,7 @@ export function dashboardHtml() {
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/network/dashboard.js?v=net3"></script>
+<script src="/network/dashboard.js?v=coiexpiry1"></script>
 </body>
 </html>`;
 }
