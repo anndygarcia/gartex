@@ -19,55 +19,89 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // A homeowner says "I want an ADU"; the sub pool that can build it is
 // called "Framing". This maps marketing language -> trade vocabulary.
 const SERVICE_TO_TRADE = {
+  'deck': 'Carpentry',
+  'electrician': 'Electrical',
+  'licensed electrician': 'Electrical',
+  'concrete patio': 'Landscaping',
+  'slab': 'Landscaping',
+  'walkway': 'Landscaping',
+  'driveway': 'Landscaping',
+  'outdoor kitchen': 'Carpentry',
+  'sunroom': 'Framing',
+  'screened porch': 'Framing',
+  'basement': 'Framing',
+  'second story': 'Framing',
   'custom home framing': 'Framing',
   'home framing': 'Framing',
-  framing: 'Framing',
+  'framing': 'Framing',
   'custom cornice': 'Cornice & Trim',
-  cornice: 'Cornice & Trim',
+  'cornice': 'Cornice & Trim',
   'architectural trim': 'Cornice & Trim',
   'crown molding': 'Cornice & Trim',
-  remodeling: 'Carpentry',
-  remodel: 'Carpentry',
-  renovation: 'Carpentry',
+  'remodeling': 'Carpentry',
+  'remodel': 'Carpentry',
+  'renovation': 'Carpentry',
   'custom adu': 'Framing',
-  adu: 'Framing',
+  'adu': 'Framing',
   'granny flat': 'Framing',
-  casita: 'Framing',
+  'casita': 'Framing',
   'tiny home': 'Framing',
   'she shed': 'Carpentry',
   'man cave': 'Carpentry',
-  sauna: 'Carpentry',
+  'sauna': 'Carpentry',
   'custom patio': 'Landscaping',
-  patio: 'Landscaping',
-  landscaping: 'Landscaping',
+  'patio': 'Landscaping',
+  'landscaping': 'Landscaping',
   'custom landscaping': 'Landscaping',
   'add-on': 'Framing',
-  addition: 'Framing',
+  'addition': 'Framing',
   'room addition': 'Framing',
-  paint: 'Drywall & Paint',
-  sheetrock: 'Drywall & Paint',
-  drywall: 'Drywall & Paint',
-  electrical: 'Electrical',
-  solar: 'Solar',
-  demolition: 'Demolition',
-  demo: 'Demolition',
-  fencing: 'Fencing',
-  fence: 'Fencing',
-  concrete: 'Concrete',
-  flatwork: 'Concrete',
-  plumbing: 'Plumbing',
-  roofing: 'Roofing',
-  siding: 'Siding',
-  decks: 'Carpentry',
-  porches: 'Carpentry',
-  pergola: 'Carpentry',
+  'paint': 'Drywall & Paint',
+  'sheetrock': 'Drywall & Paint',
+  'drywall': 'Drywall & Paint',
+  'electrical': 'Electrical',
+  'decks': 'Carpentry',
+  'porches': 'Carpentry',
+  'pergola': 'Carpentry',
   'garage conversion': 'Framing',
   'pool house': 'Framing',
   'home office': 'Carpentry',
   'guest house': 'Framing',
-  hvac: 'HVAC',
+  'solar': 'Solar',
+  'demolition': 'Demolition',
+  'demo': 'Demolition',
+  'fencing': 'Fencing',
+  'fence': 'Fencing',
+  'concrete': 'Concrete',
+  'flatwork': 'Concrete',
+  'plumbing': 'Plumbing',
+  'roofing': 'Roofing',
+  'siding': 'Siding',
+  'windows & doors': 'Windows & Doors',
+  'windows and doors': 'Windows & Doors',
+  'insulation': 'Insulation',
+  'masonry': 'Masonry',
+  'flooring': 'Flooring & Tile',
+  'flooring & tile': 'Flooring & Tile',
+  'tile': 'Flooring & Tile',
+  'cabinets': 'Cabinets & Countertops',
+  'cabinets & countertops': 'Cabinets & Countertops',
+  'countertops': 'Cabinets & Countertops',
+  'garage doors': 'Garage Doors',
+  'gutters': 'Gutters',
+  'hauling': 'Hauling',
+  'final clean': 'Final Clean',
+  'low voltage': 'Low Voltage',
+  'hvac': 'HVAC',
   'air conditioning': 'HVAC',
-  ac: 'HVAC',
+  'ac': 'HVAC',
+  'concrete slab & patio pour': 'Landscaping',
+  'backyard structure & room addition': 'Framing',
+  'backyard structure': 'Framing',
+  'concrete slab': 'Landscaping',
+  'backyard studio': 'Framing',
+  'backyard office': 'Framing',
+  'backyard shed': 'Framing',
 };
 
 /** Best-effort trade for a service label, falling back to the project text. */
@@ -75,12 +109,21 @@ function inferTrade(service, project) {
   const s = String(service || '').trim().toLowerCase();
   if (!s) return '';
   if (SERVICE_TO_TRADE[s]) return SERVICE_TO_TRADE[s];
-  for (const [key, trade] of Object.entries(SERVICE_TO_TRADE)) {
-    if (key && s.includes(key)) return trade;
+  // Match on WORD BOUNDARIES. Plain substring matching lets a short key
+  // like "ac" match inside "backyard" (b-ac-kyard) and silently mis-route
+  // the trade. Longer keys are tried first so "custom home framing" wins
+  // over "framing".
+  const byLength = Object.entries(SERVICE_TO_TRADE).sort((a, b) => b[0].length - a[0].length);
+  for (const [key, trade] of byLength) {
+    if (!key) continue;
+    const re = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+    if (re.test(s)) return trade;
   }
   const blob = `${s} ${String(project || '')}`.toLowerCase();
-  for (const [key, trade] of Object.entries(SERVICE_TO_TRADE)) {
-    if (key && blob.includes(key)) return trade;
+  for (const [key, trade] of byLength) {
+    if (!key) continue;
+    const re = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+    if (re.test(blob)) return trade;
   }
   return '';
 }
